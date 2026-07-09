@@ -1,0 +1,114 @@
+/* pages/settings/settings.wxss */
+
+.section-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #586069;
+  text-transform: uppercase;
+  letter-spacing: 1rpx;
+  margin: 24rpx 0 12rpx;
+  padding-left: 4rpx;
+}
+
+/* 存储卡片 */
+.storage-card {
+  margin-bottom: 8rpx;
+}
+
+.storage-info {
+  display: flex;
+  justify-content: space-around;
+  padding: 16rpx 0;
+}
+
+.storage-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.storage-value {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #24292e;
+}
+
+.storage-label {
+  font-size: 24rpx;
+  color: #586069;
+  margin-top: 4rpx;
+}
+
+/* 设置行 */
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8rpx 0;
+}
+
+.setting-info {
+  flex: 1;
+  margin-right: 20rpx;
+}
+
+.setting-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #24292e;
+  display: block;
+}
+
+.setting-desc {
+  font-size: 24rpx;
+  color: #586069;
+  display: block;
+  margin-top: 4rpx;
+}
+
+/* Token */
+.token-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8rpx;
+}
+
+.token-hint {
+  display: block;
+  margin-top: 8rpx;
+}
+
+/* 关于 */
+.about-card {
+  cursor: pointer;
+}
+
+.about-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8rpx;
+}
+
+.about-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #24292e;
+}
+
+.about-version {
+  font-size: 26rpx;
+  color: #0366d6;
+  background: #dbedff;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+}
+
+.about-desc {
+  display: block;
+}
+
+.text-danger {
+  color: #d73a49 !important;
+}

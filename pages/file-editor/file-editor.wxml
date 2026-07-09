@@ -1,0 +1,74 @@
+<!--pages/file-editor/file-editor.wxml - 文件编辑器-->
+<view class="editor-container">
+  <!-- 工具栏 -->
+  <view class="editor-toolbar">
+    <view class="toolbar-left">
+      <text class="file-label">{{fileName}}</text>
+      <text class="lang-badge">{{language}}</text>
+      <text class="modified-badge" wx:if="{{isModified}}">已修改</text>
+    </view>
+    <view class="toolbar-right">
+      <view class="toolbar-btn" bindtap="toggleFindReplace">🔍</view>
+      <view class="toolbar-btn" bindtap="insertTemplate">📋</view>
+      <view class="toolbar-btn" bindtap="discardChanges" wx:if="{{isModified}}">↩️</view>
+      <view class="toolbar-btn save-btn" bindtap="saveFile">💾</view>
+    </view>
+  </view>
+
+  <!-- 查找替换栏 -->
+  <view class="find-replace-bar" wx:if="{{showFindReplace}}">
+    <view class="find-row">
+      <input
+        class="find-input"
+        placeholder="查找..."
+        value="{{searchText}}"
+        bindinput="onSearchInput"
+      />
+    </view>
+    <view class="find-row">
+      <input
+        class="find-input"
+        placeholder="替换为..."
+        value="{{replaceText}}"
+        bindinput="onReplaceInput"
+      />
+      <button class="btn btn-sm btn-primary" bindtap="doReplace">替换全部</button>
+    </view>
+  </view>
+
+  <!-- 编辑器主体 -->
+  <view class="editor-body">
+    <view class="line-numbers">
+      <text class="line-number" wx:for="{{lineCount}}" wx:key="*this">{{index + 1}}</text>
+    </view>
+    <view class="editor-content">
+      <textarea
+        class="code-editor"
+        value="{{content}}"
+        bindinput="onContentChange"
+        placeholder="开始编写代码..."
+        auto-height
+        show-line-numbers
+        adjust-position
+        confirm-type="done"
+        disable-default-padding
+      />
+    </view>
+  </view>
+
+  <!-- 底部状态栏 -->
+  <view class="editor-statusbar">
+    <view class="status-item">
+      <text>行 {{lineCount}}</text>
+    </view>
+    <view class="status-item">
+      <text>字符 {{wordCount}}</text>
+    </view>
+    <view class="status-item">
+      <text>{{filePath}}</text>
+    </view>
+    <view class="status-right">
+      <button class="btn btn-sm btn-success" bindtap="saveAndStage">保存并暂存</button>
+    </view>
+  </view>
+</view>

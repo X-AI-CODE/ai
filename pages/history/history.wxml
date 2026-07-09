@@ -1,0 +1,58 @@
+<!--pages/history/history.wxml - 提交详情-->
+<view class="container">
+  <view wx:if="{{loading}}" class="loading-state">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:if="{{commit}}">
+    <!-- 提交信息卡片 -->
+    <view class="card commit-detail-card">
+      <view class="commit-message-large">{{commit.message}}</view>
+      <view class="commit-meta-detail">
+        <view class="meta-row">
+          <text class="meta-label">提交哈希</text>
+          <text class="meta-value hash-value">{{commit.hash}}</text>
+        </view>
+        <view class="meta-row">
+          <text class="meta-label">作者</text>
+          <text class="meta-value">{{commit.author.name}} &lt;{{commit.author.email}}&gt;</text>
+        </view>
+        <view class="meta-row">
+          <text class="meta-label">日期</text>
+          <text class="meta-value">{{commit.author.timestamp}}</text>
+        </view>
+        <view class="meta-row" wx:if="{{commit.parent}}">
+          <text class="meta-label">父提交</text>
+          <text class="meta-value hash-value">{{commit.parent}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 变更文件列表 -->
+    <view class="card">
+      <view class="section-header">
+        <text class="section-title">变更文件 ({{commit.diff.length}})</text>
+      </view>
+
+      <view
+        class="diff-file-item"
+        wx:for="{{commit.diff}}"
+        wx:key="path"
+        bindtap="viewDiff"
+        data-path="{{item.path}}"
+      >
+        <view class="diff-file-info">
+          <text class="change-type type-added" wx:if="{{item.type === 'added'}}">A</text>
+          <text class="change-type type-modified" wx:if="{{item.type === 'modified'}}">M</text>
+          <text class="change-type type-deleted" wx:if="{{item.type === 'deleted'}}">D</text>
+          <text class="diff-file-path">{{item.path}}</text>
+        </view>
+        <text class="diff-arrow">→</text>
+      </view>
+
+      <view class="empty-hint" wx:if="{{commit.diff.length === 0}}">
+        <text>无文件变更</text>
+      </view>
+    </view>
+  </view>
+</view>

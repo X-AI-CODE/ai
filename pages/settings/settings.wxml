@@ -1,0 +1,160 @@
+<!--pages/settings/settings.wxml - 设置页-->
+<view class="container">
+  <!-- 存储信息 -->
+  <view class="card storage-card">
+    <view class="storage-info">
+      <view class="storage-item">
+        <text class="storage-value">{{repoCount}}</text>
+        <text class="storage-label">仓库</text>
+      </view>
+      <view class="storage-item">
+        <text class="storage-value">{{storageUsed}}</text>
+        <text class="storage-label">存储使用</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Git配置 -->
+  <view class="section-title">Git 配置</view>
+  <view class="card">
+    <view class="input-group">
+      <text class="input-label">默认分支名</text>
+      <input
+        class="input"
+        value="{{settings.defaultBranch}}"
+        placeholder="main"
+        data-field="defaultBranch"
+        bindinput="onDefaultBranchInput"
+      />
+    </view>
+    <view class="input-group">
+      <text class="input-label">作者名称</text>
+      <input
+        class="input"
+        value="{{settings.authorName}}"
+        placeholder="Your Name"
+        data-field="authorName"
+        bindinput="onAuthorNameInput"
+      />
+    </view>
+    <view class="input-group">
+      <text class="input-label">作者邮箱</text>
+      <input
+        class="input"
+        value="{{settings.authorEmail}}"
+        placeholder="you@example.com"
+        data-field="authorEmail"
+        bindinput="onAuthorEmailInput"
+      />
+    </view>
+  </view>
+
+  <!-- 同步设置 -->
+  <view class="section-title">同步设置</view>
+  <view class="card">
+    <view class="setting-row">
+      <view class="setting-info">
+        <text class="setting-name">自动同步</text>
+        <text class="setting-desc">定期从远程仓库拉取更新</text>
+      </view>
+      <switch
+        checked="{{settings.autoSync}}"
+        bindchange="onSettingChange"
+        data-field="autoSync"
+      />
+    </view>
+    <view class="input-group mt-20" wx:if="{{settings.autoSync}}">
+      <text class="input-label">同步间隔 (分钟)</text>
+      <input
+        class="input"
+        type="number"
+        value="{{settings.syncInterval}}"
+        data-field="syncInterval"
+        bindinput="onSyncIntervalInput"
+      />
+    </view>
+  </view>
+
+  <!-- API Token -->
+  <view class="section-title">API Token</view>
+  <view class="card">
+    <view class="input-group">
+      <view class="token-header">
+        <text class="input-label">GitHub Token</text>
+        <button class="btn btn-sm btn-primary" bindtap="saveGithubToken">保存</button>
+      </view>
+      <input
+        class="input"
+        password
+        placeholder="ghp_xxxxxxxxxxxx"
+        value="{{githubToken}}"
+        bindinput="onGithubTokenInput"
+      />
+      <text class="token-hint text-small text-muted">用于访问私有仓库，需要repo权限</text>
+    </view>
+
+    <view class="divider"></view>
+
+    <view class="input-group">
+      <view class="token-header">
+        <text class="input-label">GitLab Token</text>
+        <button class="btn btn-sm btn-primary" bindtap="saveGitlabToken">保存</button>
+      </view>
+      <input
+        class="input"
+        password
+        placeholder="glpat-xxxxxxxxxxxx"
+        value="{{gitlabToken}}"
+        bindinput="onGitlabTokenInput"
+      />
+      <text class="token-hint text-small text-muted">Personal Access Token，需要read_repository权限</text>
+    </view>
+
+    <view class="divider"></view>
+
+    <view class="input-group">
+      <view class="token-header">
+        <text class="input-label">Gitee Token</text>
+        <button class="btn btn-sm btn-primary" bindtap="saveGiteeToken">保存</button>
+      </view>
+      <input
+        class="input"
+        password
+        placeholder="xxxxxxxxxxxxxxxxxxxx"
+        value="{{giteeToken}}"
+        bindinput="onGiteeTokenInput"
+      />
+      <text class="token-hint text-small text-muted">私人令牌，在Gitee设置中生成</text>
+    </view>
+  </view>
+
+  <!-- 数据管理 -->
+  <view class="section-title">数据管理</view>
+  <view class="card">
+    <view class="setting-row">
+      <view class="setting-info">
+        <text class="setting-name">导出数据</text>
+        <text class="setting-desc">将仓库列表和设置导出为JSON</text>
+      </view>
+      <button class="btn btn-sm btn-outline" bindtap="exportData">导出</button>
+    </view>
+    <view class="divider"></view>
+    <view class="setting-row">
+      <view class="setting-info">
+        <text class="setting-name">清除所有数据</text>
+        <text class="setting-desc text-danger">删除所有本地仓库和设置</text>
+      </view>
+      <button class="btn btn-sm btn-danger" bindtap="clearCache">清除</button>
+    </view>
+  </view>
+
+  <!-- 关于 -->
+  <view class="section-title">关于</view>
+  <view class="card about-card" bindtap="showAbout">
+    <view class="about-row">
+      <text class="about-name">GitFlow</text>
+      <text class="about-version">v{{version}}</text>
+    </view>
+    <text class="about-desc text-small text-muted">微信小程序Git管理工具</text>
+  </view>
+</view>

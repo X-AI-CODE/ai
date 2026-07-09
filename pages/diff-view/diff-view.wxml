@@ -1,0 +1,52 @@
+<!--pages/diff-view/diff-view.wxml - Diff查看-->
+<view class="container">
+  <!-- 视图切换 -->
+  <view class="view-mode-bar">
+    <view
+      class="mode-btn {{viewMode === 'unified' ? 'active' : ''}}"
+      data-mode="unified"
+      bindtap="switchViewMode"
+    >统一视图</view>
+    <view
+      class="mode-btn {{viewMode === 'split' ? 'active' : ''}}"
+      data-mode="split"
+      bindtap="switchViewMode"
+    >分栏视图</view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <text>计算差异中...</text>
+  </view>
+
+  <!-- Diff内容 -->
+  <view class="diff-container" wx:if="{{diff && !loading}}">
+    <!-- 统计信息 -->
+    <view class="diff-stats" wx:if="{{diff.stats}}">
+      <text class="stat-additions">+{{diff.stats.additions}}</text>
+      <text class="stat-deletions">-{{diff.stats.deletions}}</text>
+      <text class="stat-info">{{diff.stats.files}} 个文件变更</text>
+    </view>
+
+    <!-- Hunks -->
+    <view class="diff-hunk" wx:for="{{diff.hunks}}" wx:key="oldStart">
+      <view class="hunk-header">
+        <text>@@ -{{item.oldStart}},{{item.oldLines}} +{{item.newStart}},{{item.newLines}} @@</text>
+      </view>
+
+      <view
+        class="diff-line {{diffLine[0] === '+' ? 'addition' : ''}} {{diffLine[0] === '-' ? 'deletion' : ''}} {{diffLine[0] === ' ' ? 'context' : ''}}"
+        wx:for="{{item.lines}}"
+        wx:for-item="diffLine"
+        wx:key="*this"
+      >
+        <text class="line-prefix">{{diffLine[0]}}</text>
+        <text class="line-content">{{diffLine}}</text>
+      </view>
+    </view>
+
+    <view class="empty-diff" wx:if="{{diff.hunks.length === 0}}">
+      <text>无差异</text>
+    </view>
+  </view>
+</view>

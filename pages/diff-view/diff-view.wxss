@@ -1,0 +1,125 @@
+/* pages/diff-view/diff-view.wxss */
+
+.view-mode-bar {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+  padding: 12rpx;
+  background: #f6f8fa;
+  border-radius: 8rpx;
+}
+
+.mode-btn {
+  flex: 1;
+  text-align: center;
+  padding: 12rpx;
+  border-radius: 6rpx;
+  font-size: 26rpx;
+  color: #586069;
+}
+
+.mode-btn.active {
+  background: #0366d6;
+  color: #ffffff;
+}
+
+/* Diff统计 */
+.diff-stats {
+  display: flex;
+  gap: 20rpx;
+  padding: 16rpx 20rpx;
+  background: #f6f8fa;
+  border-radius: 8rpx;
+  margin-bottom: 16rpx;
+}
+
+.stat-additions {
+  color: #22863a;
+  font-weight: 600;
+  font-size: 26rpx;
+}
+
+.stat-deletions {
+  color: #d73a49;
+  font-weight: 600;
+  font-size: 26rpx;
+}
+
+.stat-info {
+  color: #586069;
+  font-size: 24rpx;
+}
+
+/* Diff内容 */
+.diff-container {
+  background: #ffffff;
+  border: 1rpx solid #e1e4e8;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.diff-hunk {
+  border-bottom: 1rpx solid #e1e4e8;
+}
+
+.hunk-header {
+  padding: 12rpx 20rpx;
+  background: #f1f8ff;
+  border-bottom: 1rpx solid #e1e4e8;
+  font-size: 24rpx;
+  color: #0366d6;
+  font-family: monospace;
+}
+
+.diff-line {
+  display: flex;
+  padding: 4rpx 20rpx;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 24rpx;
+  line-height: 1.6;
+}
+
+.diff-line.addition {
+  background: #e6ffed;
+}
+
+.diff-line.deletion {
+  background: #ffeef0;
+}
+
+.diff-line.context {
+  background: #ffffff;
+}
+
+.line-prefix {
+  width: 32rpx;
+  text-align: center;
+  color: #586069;
+  user-select: none;
+}
+
+.addition .line-prefix {
+  color: #22863a;
+}
+
+.deletion .line-prefix {
+  color: #d73a49;
+}
+
+.line-content {
+  flex: 1;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 60rpx;
+  color: #586069;
+}
+
+.empty-diff {
+  text-align: center;
+  padding: 60rpx;
+  color: #959da5;
+}

@@ -1,0 +1,95 @@
+/* pages/history/history.wxss */
+
+.commit-detail-card {
+  margin-bottom: 20rpx;
+}
+
+.commit-message-large {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #24292e;
+  margin-bottom: 24rpx;
+  word-break: break-all;
+}
+
+.commit-meta-detail {
+  border-top: 1rpx solid #e1e4e8;
+  padding-top: 20rpx;
+}
+
+.meta-row {
+  display: flex;
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid #f6f8fa;
+}
+
+.meta-label {
+  width: 160rpx;
+  font-size: 26rpx;
+  color: #586069;
+  font-weight: 500;
+}
+
+.meta-value {
+  flex: 1;
+  font-size: 26rpx;
+  color: #24292e;
+  word-break: break-all;
+}
+
+.hash-value {
+  font-family: monospace;
+  color: #0366d6;
+}
+
+/* Diff文件列表 */
+.diff-file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.diff-file-item:active {
+  background: #f6f8fa;
+}
+
+.diff-file-info {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.diff-file-path {
+  font-size: 26rpx;
+  font-family: monospace;
+  color: #24292e;
+}
+
+.diff-arrow {
+  color: #959da5;
+  font-size: 28rpx;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 60rpx;
+  color: #586069;
+}
+
+.empty-hint {
+  text-align: center;
+  padding: 32rpx;
+  color: #959da5;
+  font-size: 26rpx;
+}
+
+.section-header {
+  margin-bottom: 16rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+}

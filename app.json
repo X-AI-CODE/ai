@@ -1,0 +1,42 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/repo/repo",
+    "pages/file-editor/file-editor",
+    "pages/history/history",
+    "pages/diff-view/diff-view",
+    "pages/branches/branches",
+    "pages/remote-manager/remote-manager",
+    "pages/settings/settings"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#24292e",
+    "navigationBarTitleText": "GitFlow",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f6f8fa"
+  },
+  "tabBar": {
+    "color": "#586069",
+    "selectedColor": "#0366d6",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "仓库",
+        "iconPath": "static/images/tab-repo.png",
+        "selectedIconPath": "static/images/tab-repo-active.png"
+      },
+      {
+        "pagePath": "pages/settings/settings",
+        "text": "设置",
+        "iconPath": "static/images/tab-settings.png",
+        "selectedIconPath": "static/images/tab-settings-active.png"
+      }
+    ]
+  },
+  "usingComponents": {},
+  "sitemapLocation": "sitemap.json",
+  "style": "v2"
+}

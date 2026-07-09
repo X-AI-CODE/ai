@@ -1,0 +1,154 @@
+/* pages/file-editor/file-editor.wxss */
+
+.editor-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #1e1e1e;
+}
+
+/* 工具栏 */
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 24rpx;
+  background: #2d2d2d;
+  border-bottom: 1rpx solid #404040;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.file-label {
+  font-size: 26rpx;
+  color: #cccccc;
+  font-weight: 500;
+}
+
+.lang-badge {
+  font-size: 20rpx;
+  color: #569cd6;
+  background: #264f78;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+}
+
+.modified-badge {
+  font-size: 20rpx;
+  color: #f9a825;
+  background: #3d3200;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.toolbar-btn {
+  font-size: 32rpx;
+  padding: 8rpx;
+  border-radius: 6rpx;
+}
+
+.toolbar-btn:active {
+  background: #404040;
+}
+
+.save-btn {
+  background: #0e639c;
+  padding: 8rpx 16rpx;
+  border-radius: 6rpx;
+  font-size: 28rpx;
+}
+
+/* 查找替换 */
+.find-replace-bar {
+  padding: 16rpx 24rpx;
+  background: #252526;
+  border-bottom: 1rpx solid #404040;
+}
+
+.find-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 12rpx;
+}
+
+.find-row:last-child {
+  margin-bottom: 0;
+}
+
+.find-input {
+  flex: 1;
+  padding: 12rpx 16rpx;
+  background: #3c3c3c;
+  border: 1rpx solid #555555;
+  border-radius: 6rpx;
+  color: #cccccc;
+  font-size: 26rpx;
+}
+
+/* 编辑器主体 */
+.editor-body {
+  flex: 1;
+  display: flex;
+  overflow: auto;
+}
+
+.line-numbers {
+  width: 80rpx;
+  padding: 16rpx 8rpx;
+  background: #1e1e1e;
+  border-right: 1rpx solid #404040;
+  text-align: right;
+}
+
+.line-number {
+  display: block;
+  font-size: 24rpx;
+  line-height: 1.8;
+  color: #858585;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+}
+
+.editor-content {
+  flex: 1;
+  padding: 16rpx;
+}
+
+.code-editor {
+  width: 100%;
+  min-height: 100%;
+  color: #d4d4d4;
+  font-size: 26rpx;
+  line-height: 1.8;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  background: transparent;
+  border: none;
+}
+
+/* 状态栏 */
+.editor-statusbar {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 24rpx;
+  background: #007acc;
+  gap: 24rpx;
+}
+
+.status-item {
+  font-size: 22rpx;
+  color: #ffffff;
+}
+
+.status-right {
+  margin-left: auto;
+}

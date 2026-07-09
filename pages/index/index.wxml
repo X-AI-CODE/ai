@@ -1,5 +1,20 @@
 <!--pages/index/index.wxml - 仓库列表页-->
 <view class="container">
+  <!-- 工作空间切换器 -->
+  <view class="workspace-bar" bindtap="showWorkspacePicker">
+    <view class="workspace-info" wx:if="{{currentWorkspace}}">
+      <text class="workspace-icon">{{currentWorkspace.icon}}</text>
+      <view class="workspace-text">
+        <text class="workspace-name">{{currentWorkspace.name}}</text>
+        <text class="workspace-count">{{currentWorkspace.repoCount || 0}} 个仓库</text>
+      </view>
+    </view>
+    <view class="workspace-arrow">
+      <text>切换</text>
+      <text class="arrow-icon">▾</text>
+    </view>
+  </view>
+
   <!-- 搜索栏 -->
   <view class="search-bar">
     <view class="search-input-wrap">
@@ -139,6 +154,43 @@
       <view class="modal-footer">
         <button class="btn btn-outline" bindtap="hideCreateRepo">取消</button>
         <button class="btn btn-primary" bindtap="createRepo">创建</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 工作空间选择器 -->
+  <view class="modal-mask" wx:if="{{showWorkspacePicker}}" bindtap="hideWorkspacePicker">
+    <view class="modal-content modal-bottom" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">选择工作空间</text>
+        <text class="modal-close" bindtap="hideWorkspacePicker">✕</text>
+      </view>
+
+      <view class="workspace-list">
+        <view
+          class="workspace-item {{item.isCurrent ? 'active' : ''}}"
+          wx:for="{{workspaces}}"
+          wx:key="id"
+          bindtap="switchWorkspace"
+          data-id="{{item.id}}"
+        >
+          <view class="workspace-item-left">
+            <text class="workspace-item-icon">{{item.icon}}</text>
+            <view class="workspace-item-info">
+              <text class="workspace-item-name">{{item.name}}</text>
+              <text class="workspace-item-desc" wx:if="{{item.description}}">{{item.description}}</text>
+              <text class="workspace-item-meta">{{item.repoCount || 0}} 个仓库 · {{item.lastAccessedText}}</text>
+            </view>
+          </view>
+          <view class="workspace-item-right">
+            <text class="current-tag" wx:if="{{item.isCurrent}}">当前</text>
+            <view class="workspace-color-dot" style="background: {{item.color}}"></view>
+          </view>
+        </view>
+      </view>
+
+      <view class="modal-footer">
+        <button class="btn btn-outline" bindtap="manageWorkspaces">⚙️ 管理工作空间</button>
       </view>
     </view>
   </view>

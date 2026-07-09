@@ -4,6 +4,14 @@
 
 ## 📱 功能概览
 
+### 📂 工作空间
+- 创建多个工作空间（工作、个人、开源等）
+- 快速切换当前工作空间
+- 每个空间独立管理仓库集合
+- 预设模板快速创建
+- 自定义图标和主题色
+- 自动迁移旧仓库到新空间
+
 ### 🏠 仓库管理
 - 创建本地 Git 仓库
 - 仓库列表浏览和搜索
@@ -78,6 +86,7 @@
 │   ├── diff-view/            # Diff 对比页
 │   ├── branches/             # 分支管理页
 │   ├── remote-manager/       # 远程仓库管理页
+│   ├── workspace-manager/    # 工作空间管理页
 │   └── settings/             # 设置页
 │
 ├── utils/                    # 工具模块
@@ -85,6 +94,7 @@
 │   ├── git-object-store.js   # Git 对象存储 (blob/tree/commit/tag)
 │   ├── index-manager.js      # 暂存区管理
 │   ├── diff-engine.js        # Diff 计算引擎
+│   ├── workspace-manager.js  # 工作空间管理
 │   ├── remote-manager.js     # 远程仓库管理
 │   └── util.js               # 通用工具函数
 │

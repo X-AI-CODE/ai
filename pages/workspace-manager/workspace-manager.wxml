@@ -1,0 +1,206 @@
+<!--pages/workspace-manager/workspace-manager.wxml - 工作空间管理-->
+<view class="container">
+  <!-- 顶部说明 -->
+  <view class="intro-card card">
+    <text class="intro-title">📂 工作空间</text>
+    <text class="intro-desc">使用工作空间对不同项目的仓库进行分类管理。你可以创建多个工作空间（如"工作"、"个人"、"开源"），在首页快速切换。</text>
+  </view>
+
+  <!-- 工作空间列表 -->
+  <view class="section-header flex-between">
+    <text class="section-title">所有空间 ({{workspaces.length}})</text>
+    <view class="flex">
+      <button class="btn btn-sm btn-outline mr-10" bindtap="organizeOrphans">整理仓库</button>
+      <button class="btn btn-sm btn-primary" bindtap="showCreate">+ 新建</button>
+    </view>
+  </view>
+
+  <view class="workspace-list">
+    <view
+      class="workspace-card card {{item.isCurrent ? 'is-current' : ''}}"
+      wx:for="{{workspaces}}"
+      wx:key="id"
+    >
+      <view class="workspace-card-top">
+        <view class="workspace-card-left">
+          <view class="workspace-avatar" style="background: {{item.color}}20; border-color: {{item.color}}">
+            <text>{{item.icon}}</text>
+          </view>
+          <view class="workspace-card-info">
+            <view class="workspace-card-name-row">
+              <text class="workspace-card-name">{{item.name}}</text>
+              <view class="current-badge" wx:if="{{item.isCurrent}}">当前</view>
+            </view>
+            <text class="workspace-card-desc" wx:if="{{item.description}}">{{item.description}}</text>
+            <view class="workspace-card-stats">
+              <text>{{item.repoCount || 0}} 个仓库</text>
+              <text>·</text>
+              <text>{{item.lastAccessedText}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="workspace-card-actions">
+        <button
+          class="btn btn-sm {{item.isCurrent ? 'btn-outline' : 'btn-primary'}}"
+          catchtap="switchWorkspace"
+          data-id="{{item.id}}"
+          disabled="{{item.isCurrent}}"
+        >
+          {{item.isCurrent ? '✓ 使用中' : '切换到此空间'}}
+        </button>
+        <button class="btn btn-sm btn-outline" catchtap="showEdit" data-id="{{item.id}}">编辑</button>
+        <button class="btn btn-sm btn-danger" catchtap="deleteWorkspace" data-id="{{item.id}}">删除</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快捷模板 -->
+  <view class="section-title mt-30">快速创建模板</view>
+  <view class="template-grid">
+    <view
+      class="template-card"
+      wx:for="{{templates}}"
+      wx:key="key"
+      bindtap="createFromTemplate"
+      data-template="{{item.key}}"
+    >
+      <text class="template-icon">{{item.icon}}</text>
+      <text class="template-name">{{item.name}}</text>
+      <text class="template-desc">{{item.desc}}</text>
+    </view>
+  </view>
+
+  <!-- 创建工作空间弹窗 -->
+  <view class="modal-mask" wx:if="{{showCreateModal}}" bindtap="hideCreate">
+    <view class="modal-content" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">新建工作空间</text>
+        <text class="modal-close" bindtap="hideCreate">✕</text>
+      </view>
+      <view class="modal-body">
+        <view class="input-group">
+          <text class="input-label">名称 *</text>
+          <input
+            class="input"
+            placeholder="例如: 工作项目"
+            value="{{formData.name}}"
+            bindinput="onNameInput"
+            auto-focus
+          />
+        </view>
+        <view class="input-group">
+          <text class="input-label">描述</text>
+          <input
+            class="input"
+            placeholder="工作空间的用途说明"
+            value="{{formData.description}}"
+            bindinput="onDescInput"
+          />
+        </view>
+
+        <!-- 图标选择 -->
+        <view class="input-group">
+          <text class="input-label">图标</text>
+          <view class="icon-selector" bindtap="showIconPicker">
+            <text class="selected-icon">{{formData.icon}}</text>
+            <text class="select-hint">点击选择</text>
+          </view>
+        </view>
+
+        <!-- 颜色选择 -->
+        <view class="input-group">
+          <text class="input-label">主题色</text>
+          <view class="color-selector">
+            <view
+              class="color-option {{formData.color === item ? 'selected' : ''}}"
+              wx:for="{{colors}}"
+              wx:key="*this"
+              style="background: {{item}}"
+              catchtap="selectColor"
+              data-color="{{item}}"
+            ></view>
+          </view>
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn btn-outline" bindtap="showTemplatePicker">从模板创建</button>
+        <button class="btn btn-primary" bindtap="doCreate">创建</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 编辑弹窗（复用创建表单） -->
+  <view class="modal-mask" wx:if="{{showEditModal}}" bindtap="hideEdit">
+    <view class="modal-content" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">编辑工作空间</text>
+        <text class="modal-close" bindtap="hideEdit">✕</text>
+      </view>
+      <view class="modal-body">
+        <view class="input-group">
+          <text class="input-label">名称</text>
+          <input
+            class="input"
+            value="{{formData.name}}"
+            bindinput="onNameInput"
+          />
+        </view>
+        <view class="input-group">
+          <text class="input-label">描述</text>
+          <input
+            class="input"
+            value="{{formData.description}}"
+            bindinput="onDescInput"
+          />
+        </view>
+        <view class="input-group">
+          <text class="input-label">图标</text>
+          <view class="icon-selector" bindtap="showIconPicker">
+            <text class="selected-icon">{{formData.icon}}</text>
+            <text class="select-hint">点击选择</text>
+          </view>
+        </view>
+        <view class="input-group">
+          <text class="input-label">主题色</text>
+          <view class="color-selector">
+            <view
+              class="color-option {{formData.color === item ? 'selected' : ''}}"
+              wx:for="{{colors}}"
+              wx:key="*this"
+              style="background: {{item}}"
+              catchtap="selectColor"
+              data-color="{{item}}"
+            ></view>
+          </view>
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn btn-outline" bindtap="hideEdit">取消</button>
+        <button class="btn btn-primary" bindtap="doEdit">保存</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 图标选择弹窗 -->
+  <view class="modal-mask" wx:if="{{showIconPicker}}" bindtap="hideIconPicker">
+    <view class="modal-content icon-picker-content" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">选择图标</text>
+        <text class="modal-close" bindtap="hideIconPicker">✕</text>
+      </view>
+      <view class="icon-grid">
+        <view
+          class="icon-option {{formData.icon === item ? 'selected' : ''}}"
+          wx:for="{{icons}}"
+          wx:key="*this"
+          catchtap="selectIcon"
+          data-icon="{{item}}"
+        >
+          <text>{{item}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

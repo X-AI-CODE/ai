@@ -1,10 +1,14 @@
 // pages/index/index.js - 仓库列表页
 import { GitStore } from '../../utils/git-store';
 import { RemoteManager } from '../../utils/remote-manager';
+import { WorkspaceManager } from '../../utils/workspace-manager';
 
 Page({
   data: {
     repos: [],
+    workspaces: [],
+    currentWorkspace: null,
+    showWorkspacePicker: false,
     loading: true,
     searchKeyword: '',
     showCreateModal: false,
@@ -16,17 +20,68 @@ Page({
   },
 
   onLoad() {
+    this.workspaceManager = new WorkspaceManager();
     this.gitStore = new GitStore();
     this.remoteManager = new RemoteManager();
+
+    // 监听工作空间切换
+    const app = getApp();
+    app.onWorkspaceChange(() => {
+      this.gitStore = new GitStore();
+      this.loadWorkspaces();
+      this.loadRepos();
+    });
   },
 
   onShow() {
+    this.loadWorkspaces();
     this.loadRepos();
   },
 
   onPullDownRefresh() {
     this.loadRepos();
     wx.stopPullDownRefresh();
+  },
+
+  // 加载工作空间列表
+  loadWorkspaces() {
+    const workspaces = this.workspaceManager.getListWithStats();
+    const currentWorkspace = this.workspaceManager.getCurrent();
+    this.setData({ workspaces, currentWorkspace });
+  },
+
+  // 显示工作空间选择器
+  showWorkspacePicker() {
+    this.loadWorkspaces();
+    this.setData({ showWorkspacePicker: true });
+  },
+
+  hideWorkspacePicker() {
+    this.setData({ showWorkspacePicker: false });
+  },
+
+  // 切换工作空间
+  switchWorkspace(e) {
+    const workspaceId = e.currentTarget.dataset.id;
+    if (workspaceId === this.workspaceManager.currentWorkspaceId) {
+      this.hideWorkspacePicker();
+      return;
+    }
+
+    const app = getApp();
+    app.switchWorkspace(workspaceId);
+    this.gitStore = new GitStore();
+    this.loadWorkspaces();
+    this.loadRepos();
+    this.hideWorkspacePicker();
+
+    const ws = this.workspaceManager.getCurrent();
+    wx.showToast({ title: `已切换到 ${ws.icon} ${ws.name}`, icon: 'none' });
+  },
+
+  // 管理工作空间
+  manageWorkspaces() {
+    wx.navigateTo({ url: '/pages/workspace-manager/workspace-manager' });
   },
 
   // 加载仓库列表

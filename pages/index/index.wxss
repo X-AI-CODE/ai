@@ -1,5 +1,139 @@
 /* pages/index/index.wxss */
 
+/* 工作空间切换器 */
+.workspace-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 24rpx;
+  background: linear-gradient(135deg, #f6f8fa 0%, #ffffff 100%);
+  border: 1rpx solid #e1e4e8;
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+  transition: all 0.2s;
+}
+
+.workspace-bar:active {
+  background: #f0f0f0;
+}
+
+.workspace-info {
+  display: flex;
+  align-items: center;
+}
+
+.workspace-icon {
+  font-size: 40rpx;
+  margin-right: 16rpx;
+}
+
+.workspace-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.workspace-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #24292e;
+}
+
+.workspace-count {
+  font-size: 24rpx;
+  color: #586069;
+  margin-top: 4rpx;
+}
+
+.workspace-arrow {
+  display: flex;
+  align-items: center;
+  font-size: 26rpx;
+  color: #0366d6;
+}
+
+.arrow-icon {
+  margin-left: 8rpx;
+  font-size: 28rpx;
+}
+
+/* 工作空间列表 */
+.workspace-list {
+  max-height: 600rpx;
+  overflow-y: auto;
+}
+
+.workspace-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx;
+  border-bottom: 1rpx solid #eaecef;
+  transition: background 0.15s;
+}
+
+.workspace-item:active {
+  background: #f6f8fa;
+}
+
+.workspace-item.active {
+  background: #f0f8ff;
+}
+
+.workspace-item-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.workspace-item-icon {
+  font-size: 40rpx;
+  margin-right: 20rpx;
+}
+
+.workspace-item-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.workspace-item-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #24292e;
+}
+
+.workspace-item-desc {
+  font-size: 24rpx;
+  color: #586069;
+  margin-top: 4rpx;
+}
+
+.workspace-item-meta {
+  font-size: 22rpx;
+  color: #959da5;
+  margin-top: 4rpx;
+}
+
+.workspace-item-right {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.current-tag {
+  font-size: 22rpx;
+  background: #28a745;
+  color: #ffffff;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+}
+
+.workspace-color-dot {
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 50%;
+}
+
 .search-bar {
   margin-bottom: 20rpx;
 }

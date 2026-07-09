@@ -4,12 +4,47 @@
   <view class="card storage-card">
     <view class="storage-info">
       <view class="storage-item">
+        <text class="storage-value">{{workspaceCount}}</text>
+        <text class="storage-label">工作空间</text>
+      </view>
+      <view class="storage-item">
         <text class="storage-value">{{repoCount}}</text>
         <text class="storage-label">仓库</text>
       </view>
       <view class="storage-item">
         <text class="storage-value">{{storageUsed}}</text>
         <text class="storage-label">存储使用</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 工作空间设置 -->
+  <view class="section-title">工作空间</view>
+  <view class="card">
+    <view class="setting-row" bindtap="goToWorkspaceManager">
+      <view class="setting-info">
+        <text class="setting-name">管理工作空间</text>
+        <text class="setting-desc">创建、编辑、删除工作空间</text>
+      </view>
+      <text class="setting-action">→ </text>
+    </view>
+    <view class="divider"></view>
+    <view class="setting-info mb-10">
+      <text class="setting-name">当前默认空间</text>
+      <text class="setting-desc">新建仓库时将归入此空间</text>
+    </view>
+    <view class="workspace-quick-list">
+      <view
+        class="workspace-quick-item {{item.isCurrent ? 'active' : ''}}"
+        wx:for="{{workspaces}}"
+        wx:key="id"
+        bindtap="switchDefaultWorkspace"
+        data-id="{{item.id}}"
+      >
+        <text class="ws-quick-icon">{{item.icon}}</text>
+        <text class="ws-quick-name">{{item.name}}</text>
+        <text class="ws-quick-count">({{item.repoCount || 0}})</text>
+        <text class="ws-quick-check" wx:if="{{item.isCurrent}}">✓</text>
       </view>
     </view>
   </view>

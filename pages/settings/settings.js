@@ -1,28 +1,46 @@
 // pages/settings/settings.js - 设置页
+import { WorkspaceManager } from '../../utils/workspace-manager';
+
 Page({
   data: {
     settings: {},
+    workspaces: [],
+    currentWorkspace: null,
     githubToken: '',
     gitlabToken: '',
     giteeToken: '',
     storageUsed: '0 MB',
     repoCount: 0,
+    workspaceCount: 0,
     version: '1.0.0'
   },
 
   onLoad() {
+    this.workspaceManager = new WorkspaceManager();
     this.loadSettings();
     this.loadTokens();
+    this.loadWorkspaces();
     this.calculateStorage();
   },
 
   onShow() {
     this.loadSettings();
+    this.loadWorkspaces();
   },
 
   loadSettings() {
     const app = getApp();
     this.setData({ settings: app.globalData.settings || {} });
+  },
+
+  loadWorkspaces() {
+    const workspaces = this.workspaceManager.getListWithStats();
+    const currentWorkspace = this.workspaceManager.getCurrent();
+    this.setData({
+      workspaces,
+      currentWorkspace,
+      workspaceCount: workspaces.length
+    });
   },
 
   loadTokens() {
@@ -41,7 +59,6 @@ Page({
         repoCount: 0
       });
 
-      // 获取仓库数量
       const repos = wx.getStorageSync('gitflow_repos');
       if (repos) {
         this.setData({ repoCount: JSON.parse(repos).length });
@@ -49,6 +66,20 @@ Page({
     } catch (e) {
       // ignore
     }
+  },
+
+  // 跳转到工作空间管理
+  goToWorkspaceManager() {
+    wx.navigateTo({ url: '/pages/workspace-manager/workspace-manager' });
+  },
+
+  // 切换默认工作空间
+  switchDefaultWorkspace(e) {
+    const workspaceId = e.currentTarget.dataset.id;
+    const app = getApp();
+    app.switchWorkspace(workspaceId);
+    this.loadWorkspaces();
+    wx.showToast({ title: '已切换默认空间', icon: 'success' });
   },
 
   // 设置更新
@@ -113,18 +144,16 @@ Page({
   clearCache() {
     wx.showModal({
       title: '清除缓存',
-      content: '这将清除所有本地数据，包括仓库和设置。确定继续吗？',
+      content: '这将清除所有本地数据，包括仓库、工作空间和设置。确定继续吗？',
       confirmColor: '#d73a49',
       success: (res) => {
         if (res.confirm) {
           wx.showLoading({ title: '清除中...' });
 
-          // 清除所有storage
           try {
-            const keys = ['gitflow_repos', 'gitflow_remotes', 'gitflow_settings'];
+            const keys = ['gitflow_repos', 'gitflow_remotes', 'gitflow_settings', 'gitflow_workspaces'];
             keys.forEach(key => wx.removeStorageSync(key));
 
-            // 清除文件系统
             const fs = wx.getFileSystemManager();
             const basePath = `${wx.env.USER_DATA_PATH}/gitflow`;
             try {
@@ -139,6 +168,7 @@ Page({
             wx.hideLoading();
             wx.showToast({ title: '已清除', icon: 'success' });
             this.calculateStorage();
+            this.loadWorkspaces();
           } catch (error) {
             wx.hideLoading();
             wx.showToast({ title: error.message, icon: 'none' });
@@ -152,13 +182,14 @@ Page({
   exportData() {
     wx.showModal({
       title: '导出数据',
-      content: '将导出仓库列表和设置到剪贴板。',
+      content: '将导出仓库列表、工作空间和设置到剪贴板。',
       success: (res) => {
         if (res.confirm) {
           const data = {
             repos: wx.getStorageSync('gitflow_repos'),
             remotes: wx.getStorageSync('gitflow_remotes'),
             settings: wx.getStorageSync('gitflow_settings'),
+            workspaces: wx.getStorageSync('gitflow_workspaces'),
             exportedAt: new Date().toISOString()
           };
 
@@ -177,7 +208,7 @@ Page({
   showAbout() {
     wx.showModal({
       title: '关于 GitFlow',
-      content: 'GitFlow 微信小程序 v1.0.0\n\n一个运行在微信中的Git管理工具，支持本地仓库管理、远程同步和多平台Git服务集成。\n\n功能特点：\n• 本地Git仓库创建和管理\n• 完整的分支操作\n• 从GitHub/GitLab/Gitee同步\n• 文件编辑和Diff查看\n• 暂存(Stash)管理',
+      content: 'GitFlow 微信小程序 v1.0.0\n\n一个运行在微信中的Git管理工具，支持多工作空间管理、本地仓库、远程同步和多平台Git服务集成。\n\n功能特点：\n• 多工作空间管理，分类组织仓库\n• 本地Git仓库创建和管理\n• 完整的分支操作\n• 从GitHub/GitLab/Gitee同步\n• 文件编辑和Diff查看\n• 暂存(Stash)管理',
       showCancel: false,
       confirmText: '知道了'
     });

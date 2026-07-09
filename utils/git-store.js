@@ -12,7 +12,10 @@ import { DiffEngine } from './diff-engine';
 export class GitStore {
   constructor() {
     this.fs = wx.getFileSystemManager();
-    this.basePath = `${wx.env.USER_DATA_PATH}/gitflow`;
+    // 从当前工作空间获取基础路径
+    const wsManager = this._getWorkspaceManager();
+    const workspace = wsManager ? wsManager.getCurrent() : null;
+    this.basePath = workspace ? workspace.path : `${wx.env.USER_DATA_PATH}/gitflow/spaces/default`;
     this.objectStore = new GitObjectStore(this.fs, this.basePath);
     this.indexManager = new IndexManager(this.fs, this.basePath);
     this.diffEngine = new DiffEngine();
@@ -21,13 +24,51 @@ export class GitStore {
     this._loadRepoList();
   }
 
+  /**
+   * 获取工作空间管理器
+   */
+  _getWorkspaceManager() {
+    try {
+      const app = getApp();
+      return app.globalData.workspaceManager;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /**
+   * 获取当前工作空间
+   */
+  getCurrentWorkspace() {
+    const wsManager = this._getWorkspaceManager();
+    return wsManager ? wsManager.getCurrent() : null;
+  }
+
+  /**
+   * 切换工作空间后刷新路径
+   */
+  refreshWorkspacePath() {
+    const wsManager = this._getWorkspaceManager();
+    const workspace = wsManager ? wsManager.getCurrent() : null;
+    this.basePath = workspace ? workspace.path : `${wx.env.USER_DATA_PATH}/gitflow/spaces/default`;
+    this.objectStore = new GitObjectStore(this.fs, this.basePath);
+    this.indexManager = new IndexManager(this.fs, this.basePath);
+  }
+
   // ========== 仓库管理 ==========
 
   /**
    * 获取所有仓库列表
    */
   getRepoList() {
-    return this.repos;
+    const wsManager = this._getWorkspaceManager();
+    if (!wsManager) return this.repos;
+
+    const workspace = wsManager.getCurrent();
+    if (!workspace) return this.repos;
+
+    // 只返回当前工作空间下的仓库
+    return this.repos.filter(r => workspace.repos.includes(r.id));
   }
 
   /**
@@ -91,6 +132,12 @@ export class GitStore {
     // 保存仓库元数据
     this.repos.push(repoMeta);
     this._saveRepoList();
+
+    // 将仓库添加到当前工作空间
+    const wsManager = this._getWorkspaceManager();
+    if (wsManager) {
+      wsManager.addRepo(wsManager.currentWorkspaceId, repoMeta.id);
+    }
 
     return repoMeta;
   }

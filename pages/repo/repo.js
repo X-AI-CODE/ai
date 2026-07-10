@@ -33,6 +33,14 @@ Page({
     this.loadRepo();
   },
 
+  onPullDownRefresh() {
+    this.loadRepo().then(() => {
+      wx.stopPullDownRefresh();
+    }).catch(() => {
+      wx.stopPullDownRefresh();
+    });
+  },
+
   // 加载仓库数据
   async loadRepo() {
     try {

@@ -78,6 +78,8 @@ Page({
     const workspaceId = e.currentTarget.dataset.id;
     const app = getApp();
     app.switchWorkspace(workspaceId);
+    // 同步刷新 GitStore
+    app.globalData.gitStore = new (require('../../utils/git-store').GitStore)();
     this.loadWorkspaces();
     wx.showToast({ title: '已切换默认空间', icon: 'success' });
   },

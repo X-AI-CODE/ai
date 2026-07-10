@@ -16,12 +16,33 @@ export class GitStore {
     const wsManager = this._getWorkspaceManager();
     const workspace = wsManager ? wsManager.getCurrent() : null;
     this.basePath = workspace ? workspace.path : `${wx.env.USER_DATA_PATH}/gitflow/spaces/default`;
-    this.objectStore = new GitObjectStore(this.fs, this.basePath);
-    this.indexManager = new IndexManager(this.fs, this.basePath);
+    // objectStore 和 indexManager 按仓库路径动态创建
+    this._objectStores = {};
+    this._indexManagers = {};
     this.diffEngine = new DiffEngine();
     this.repos = [];
     this.currentRepo = null;
     this._loadRepoList();
+  }
+
+  /**
+   * 获取仓库的 ObjectStore（每个仓库独立）
+   */
+  _getObjectStore(repoPath) {
+    if (!this._objectStores[repoPath]) {
+      this._objectStores[repoPath] = new GitObjectStore(this.fs, repoPath);
+    }
+    return this._objectStores[repoPath];
+  }
+
+  /**
+   * 获取仓库的 IndexManager（每个仓库独立）
+   */
+  _getIndexManager(repoPath) {
+    if (!this._indexManagers[repoPath]) {
+      this._indexManagers[repoPath] = new IndexManager(this.fs, repoPath);
+    }
+    return this._indexManagers[repoPath];
   }
 
   /**
@@ -42,17 +63,6 @@ export class GitStore {
   getCurrentWorkspace() {
     const wsManager = this._getWorkspaceManager();
     return wsManager ? wsManager.getCurrent() : null;
-  }
-
-  /**
-   * 切换工作空间后刷新路径
-   */
-  refreshWorkspacePath() {
-    const wsManager = this._getWorkspaceManager();
-    const workspace = wsManager ? wsManager.getCurrent() : null;
-    this.basePath = workspace ? workspace.path : `${wx.env.USER_DATA_PATH}/gitflow/spaces/default`;
-    this.objectStore = new GitObjectStore(this.fs, this.basePath);
-    this.indexManager = new IndexManager(this.fs, this.basePath);
   }
 
   // ========== 仓库管理 ==========
@@ -112,8 +122,9 @@ export class GitStore {
     };
 
     // 创建初始提交（空树）
-    const emptyTreeHash = this.objectStore.writeTree([]);
-    const initialCommitHash = this.objectStore.writeCommit({
+    const objectStore = this._getObjectStore(repoPath);
+    const emptyTreeHash = objectStore.writeTree([]);
+    const initialCommitHash = objectStore.writeCommit({
       tree: emptyTreeHash,
       message: 'Initial commit',
       author: {
@@ -127,7 +138,8 @@ export class GitStore {
     this.fs.writeFileSync(`${gitDir}/refs/heads/${defaultBranch}`, initialCommitHash);
 
     // 初始化index
-    this.indexManager.init(repoPath);
+    const indexManager = this._getIndexManager(repoPath);
+    indexManager.init(repoPath);
 
     // 保存仓库元数据
     this.repos.push(repoMeta);
@@ -273,12 +285,14 @@ export class GitStore {
 
     const gitDir = `${repo.path}/.git`;
     const currentHash = this._getCurrentCommitHash(gitDir, repo.currentBranch);
+    const objectStore = this._getObjectStore(repo.path);
+    const indexManager = this._getIndexManager(repo.path);
 
     // 获取HEAD中的文件列表
-    const headFiles = this.objectStore.readTreeFromCommit(currentHash);
+    const headFiles = objectStore.readTreeFromCommit(currentHash);
 
     // 获取暂存区(index)中的文件列表
-    const stagedFiles = this.indexManager.getStagedFiles(repo.path);
+    const stagedFiles = indexManager.getStagedFiles(repo.path);
 
     // 获取工作区文件列表
     const workTreeFiles = this._listWorkTreeFiles(repo.path);
@@ -314,7 +328,7 @@ export class GitStore {
         } else {
           // 比较内容
           const workContent = this.fs.readFileSync(workFile.fullPath, 'utf-8');
-          const headContent = this.objectStore.readBlob(headFile.hash);
+          const headContent = objectStore.readBlob(headFile.hash);
           if (workContent !== headContent) {
             status.modified.push({ path: workFile.path });
           }
@@ -342,12 +356,15 @@ export class GitStore {
     const repo = this.repos.find(r => r.id === repoId);
     if (!repo) throw new Error('仓库不存在');
 
+    const objectStore = this._getObjectStore(repo.path);
+    const indexManager = this._getIndexManager(repo.path);
+
     for (const filePath of filePaths) {
       const fullPath = `${repo.path}/${filePath}`;
       const content = this.fs.readFileSync(fullPath);
-      const hash = this.objectStore.writeBlob(content);
+      const hash = objectStore.writeBlob(content);
 
-      this.indexManager.add(repo.path, filePath, hash);
+      indexManager.add(repo.path, filePath, hash);
     }
   }
 
@@ -358,8 +375,10 @@ export class GitStore {
     const repo = this.repos.find(r => r.id === repoId);
     if (!repo) throw new Error('仓库不存在');
 
+    const indexManager = this._getIndexManager(repo.path);
+
     for (const filePath of filePaths) {
-      this.indexManager.remove(repo.path, filePath);
+      indexManager.remove(repo.path, filePath);
     }
   }
 
@@ -385,16 +404,18 @@ export class GitStore {
     if (!repo) throw new Error('仓库不存在');
 
     const gitDir = `${repo.path}/.git`;
+    const objectStore = this._getObjectStore(repo.path);
+    const indexManager = this._getIndexManager(repo.path);
 
     // 构建tree对象
-    const stagedFiles = this.indexManager.getStagedFiles(repo.path);
-    const treeHash = this._buildTreeFromIndex(stagedFiles);
+    const stagedFiles = indexManager.getStagedFiles(repo.path);
+    const treeHash = this._buildTreeFromIndex(stagedFiles, objectStore);
 
     // 获取父提交
     const parentHash = this._getCurrentCommitHash(gitDir, repo.currentBranch);
 
     // 创建commit对象
-    const commitHash = this.objectStore.writeCommit({
+    const commitHash = objectStore.writeCommit({
       tree: treeHash,
       parent: parentHash,
       message: message,
@@ -436,6 +457,7 @@ export class GitStore {
     const branch = options.branch || repo.currentBranch;
     const maxCount = options.maxCount || 50;
     const skip = options.skip || 0;
+    const objectStore = this._getObjectStore(repo.path);
 
     let currentHash = this._getCurrentCommitHash(gitDir, branch);
     const commits = [];
@@ -443,7 +465,7 @@ export class GitStore {
     let skipped = 0;
 
     while (currentHash && count < maxCount) {
-      const commit = this.objectStore.readCommit(currentHash);
+      const commit = objectStore.readCommit(currentHash);
       if (!commit) break;
 
       if (skipped < skip) {
@@ -474,15 +496,16 @@ export class GitStore {
     const repo = this.repos.find(r => r.id === repoId);
     if (!repo) throw new Error('仓库不存在');
 
-    const commit = this.objectStore.readCommit(commitHash);
+    const objectStore = this._getObjectStore(repo.path);
+    const commit = objectStore.readCommit(commitHash);
     if (!commit) throw new Error('提交不存在');
 
     // 获取diff
     let diff = [];
     if (commit.parent) {
-      const parentCommit = this.objectStore.readCommit(commit.parent);
-      const parentTree = this.objectStore.readTreeFromCommit(commit.parent);
-      const currentTree = this.objectStore.readTree(commit.tree);
+      const parentCommit = objectStore.readCommit(commit.parent);
+      const parentTree = objectStore.readTreeFromCommit(commit.parent);
+      const currentTree = objectStore.readTree(commit.tree);
       diff = this.diffEngine.computeDiff(parentTree, currentTree);
     }
 
@@ -553,6 +576,7 @@ export class GitStore {
     try {
       // 使用GitHub API或其他Git托管服务API获取数据
       const apiData = await this._fetchFromRemoteAPI(remote.url, options);
+      const objectStore = this._getObjectStore(repo.path);
 
       // 处理获取到的引用
       for (const ref of apiData.refs) {
@@ -565,7 +589,7 @@ export class GitStore {
       // 下载pack数据并解压到对象存储
       if (apiData.packs) {
         for (const pack of apiData.packs) {
-          await this.objectStore.importPack(pack);
+          await objectStore.importPack(pack);
         }
       }
 
@@ -608,7 +632,7 @@ export class GitStore {
       }
 
       // 尝试快进合并
-      const canFastForward = await this._canFastForward(gitDir, localHash, remoteHash);
+      const canFastForward = await this._canFastForward(gitDir, localHash, remoteHash, repo.path);
 
       if (canFastForward) {
         // 快进合并
@@ -778,7 +802,7 @@ export class GitStore {
     }
 
     // 尝试快进
-    const canFF = await this._canFastForward(gitDir, currentHash, sourceHash);
+    const canFF = await this._canFastForward(gitDir, currentHash, sourceHash, repo.path);
     if (canFF && !options.noFastForward) {
       this.fs.writeFileSync(`${gitDir}/refs/heads/${repo.currentBranch}`, sourceHash);
       await this._restoreWorkingTree(repo, sourceHash);
@@ -800,14 +824,15 @@ export class GitStore {
 
     const gitDir = `${repo.path}/.git`;
     const currentHash = this._getCurrentCommitHash(gitDir, repo.currentBranch);
+    const objectStore = this._getObjectStore(repo.path);
 
     // 获取HEAD版本
     let oldContent = '';
     try {
-      const headFiles = this.objectStore.readTreeFromCommit(currentHash);
+      const headFiles = objectStore.readTreeFromCommit(currentHash);
       const fileEntry = headFiles.find(f => f.path === filePath);
       if (fileEntry) {
-        oldContent = this.objectStore.readBlob(fileEntry.hash);
+        oldContent = objectStore.readBlob(fileEntry.hash);
       }
     } catch (e) {
       // 新文件
@@ -953,6 +978,7 @@ ${(options.remotes || []).map(r => `[remote "${r.name}"]
 
   _listWorkTreeFiles(repoPath) {
     const files = [];
+    const ignorePatterns = this._loadGitignore(repoPath);
     const walk = (dir, prefix) => {
       try {
         const entries = this.fs.readdirSync(dir);
@@ -960,11 +986,15 @@ ${(options.remotes || []).map(r => `[remote "${r.name}"]
           if (entry === '.git') continue;
           const fullPath = `${dir}/${entry}`;
           const relativePath = prefix ? `${prefix}/${entry}` : entry;
+
+          // 检查 .gitignore
+          if (this._isIgnored(relativePath, ignorePatterns)) continue;
+
           const stat = this.fs.statSync(fullPath);
           if (stat.isDirectory()) {
             walk(fullPath, relativePath);
           } else {
-            files.push({ path: relativePath, fullPath });
+            files.push({ path: relativePath, fullPath, size: stat.size });
           }
         }
       } catch (e) {
@@ -975,21 +1005,89 @@ ${(options.remotes || []).map(r => `[remote "${r.name}"]
     return files;
   }
 
-  _buildTreeFromIndex(stagedFiles) {
+  /**
+   * 加载 .gitignore 规则
+   */
+  _loadGitignore(repoPath) {
+    const ignorePath = `${repoPath}/.gitignore`;
+    try {
+      const content = this.fs.readFileSync(ignorePath, 'utf-8');
+      return content.split('\n')
+        .map(line => line.trim())
+        .filter(line => line && !line.startsWith('#'));
+    } catch (e) {
+      return [];
+    }
+  }
+
+  /**
+   * 检查文件是否匹配 .gitignore 规则
+   */
+  _isIgnored(filePath, patterns) {
+    for (const pattern of patterns) {
+      // 简单的 glob 匹配
+      const regex = pattern
+        .replace(/\./g, '\\.')
+        .replace(/\*/g, '.*')
+        .replace(/\?/g, '.');
+      if (new RegExp(`^${regex}$`).test(filePath) ||
+          new RegExp(`^${regex}/`).test(filePath) ||
+          filePath.includes(pattern.replace('*', ''))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * 检测是否为二进制文件
+   */
+  isBinaryFile(repoId, filePath) {
+    const repo = this.repos.find(r => r.id === repoId);
+    if (!repo) throw new Error('仓库不存在');
+
+    const fullPath = `${repo.path}/${filePath}`;
+    try {
+      const buffer = this.fs.readFileSync(fullPath);
+      const uint8Array = new Uint8Array(buffer);
+      
+      // 检查前 1024 字节是否包含 null 字节
+      const checkLength = Math.min(uint8Array.length, 1024);
+      for (let i = 0; i < checkLength; i++) {
+        if (uint8Array[i] === 0) return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /**
+   * 获取文件大小限制
+   */
+  _checkFileSize(size) {
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (size > maxSize) {
+      throw new Error(`文件过大 (${(size / 1024 / 1024).toFixed(2)}MB)，超过 5MB 限制`);
+    }
+  }
+
+  _buildTreeFromIndex(stagedFiles, objectStore) {
     const treeEntries = stagedFiles.map(f => ({
       path: f.path,
       hash: f.hash,
       mode: '100644',
       type: 'blob'
     }));
-    return this.objectStore.writeTree(treeEntries);
+    return objectStore.writeTree(treeEntries);
   }
 
   async _restoreWorkingTree(repo, commitHash) {
-    const files = this.objectStore.readTreeFromCommit(commitHash);
+    const objectStore = this._getObjectStore(repo.path);
+    const files = objectStore.readTreeFromCommit(commitHash);
 
     for (const file of files) {
-      const content = this.objectStore.readBlob(file.hash);
+      const content = objectStore.readBlob(file.hash);
       const fullPath = `${repo.path}/${file.path}`;
       const dir = fullPath.substring(0, fullPath.lastIndexOf('/'));
       this.fs.mkdirSync(dir, true);
@@ -997,15 +1095,16 @@ ${(options.remotes || []).map(r => `[remote "${r.name}"]
     }
   }
 
-  async _canFastForward(gitDir, baseHash, targetHash) {
+  async _canFastForward(gitDir, baseHash, targetHash, repoPath) {
     // 简单实现：检查base是否是target的祖先
+    const objectStore = this._getObjectStore(repoPath);
     let current = targetHash;
     const maxDepth = 1000;
     let depth = 0;
 
     while (current && depth < maxDepth) {
       if (current === baseHash) return true;
-      const commit = this.objectStore.readCommit(current);
+      const commit = objectStore.readCommit(current);
       if (!commit) break;
       current = commit.parent || null;
       depth++;
@@ -1016,16 +1115,17 @@ ${(options.remotes || []).map(r => `[remote "${r.name}"]
 
   async _threeWayMerge(repo, localHash, remoteHash) {
     // 找到共同祖先
-    const baseHash = await this._findMergeBase(repo.path + '/.git', localHash, remoteHash);
+    const baseHash = await this._findMergeBase(repo.path + '/.git', localHash, remoteHash, repo.path);
+    const objectStore = this._getObjectStore(repo.path);
 
     if (!baseHash) {
       return { success: false, errors: [{ message: '无法找到共同祖先' }] };
     }
 
     // 获取三个版本的树
-    const baseTree = this.objectStore.readTreeFromCommit(baseHash);
-    const localTree = this.objectStore.readTreeFromCommit(localHash);
-    const remoteTree = this.objectStore.readTreeFromCommit(remoteHash);
+    const baseTree = objectStore.readTreeFromCommit(baseHash);
+    const localTree = objectStore.readTreeFromCommit(localHash);
+    const remoteTree = objectStore.readTreeFromCommit(remoteHash);
 
     // 三方合并
     const mergeResult = this.diffEngine.threeWayMerge(baseTree, localTree, remoteTree);
@@ -1039,8 +1139,8 @@ ${(options.remotes || []).map(r => `[remote "${r.name}"]
     }
 
     // 创建合并提交
-    const mergedTreeHash = this.objectStore.writeTree(mergeResult.mergedTree);
-    const mergeCommitHash = this.objectStore.writeCommit({
+    const mergedTreeHash = objectStore.writeTree(mergeResult.mergedTree);
+    const mergeCommitHash = objectStore.writeCommit({
       tree: mergedTreeHash,
       parent: localHash,
       parent2: remoteHash, // merge commit有两个parent
@@ -1059,13 +1159,14 @@ ${(options.remotes || []).map(r => `[remote "${r.name}"]
     return { success: true, message: '合并成功', changed: true };
   }
 
-  async _findMergeBase(gitDir, hash1, hash2) {
+  async _findMergeBase(gitDir, hash1, hash2, repoPath) {
     // 获取hash1的所有祖先
+    const objectStore = this._getObjectStore(repoPath);
     const ancestors1 = new Set();
     let current = hash1;
     while (current) {
       ancestors1.add(current);
-      const commit = this.objectStore.readCommit(current);
+      const commit = objectStore.readCommit(current);
       if (!commit) break;
       current = commit.parent || null;
     }
@@ -1074,7 +1175,7 @@ ${(options.remotes || []).map(r => `[remote "${r.name}"]
     current = hash2;
     while (current) {
       if (ancestors1.has(current)) return current;
-      const commit = this.objectStore.readCommit(current);
+      const commit = objectStore.readCommit(current);
       if (!commit) break;
       current = commit.parent || null;
     }

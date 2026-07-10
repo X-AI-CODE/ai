@@ -94,21 +94,29 @@ Page({
     });
   },
 
-  // 搜索仓库
+  // 搜索仓库（带防抖）
   onSearchInput(e) {
     const keyword = e.detail.value;
     this.setData({ searchKeyword: keyword });
 
-    if (!keyword) {
-      this.loadRepos();
-      return;
+    // 清除之前的定时器
+    if (this._searchTimer) {
+      clearTimeout(this._searchTimer);
     }
 
-    const allRepos = this.gitStore.getRepoList();
-    const filtered = allRepos.filter(r =>
-      r.name.toLowerCase().includes(keyword.toLowerCase())
-    );
-    this.setData({ repos: filtered });
+    // 防抖 300ms
+    this._searchTimer = setTimeout(() => {
+      if (!keyword) {
+        this.loadRepos();
+        return;
+      }
+
+      const allRepos = this.gitStore.getRepoList();
+      const filtered = allRepos.filter(r =>
+        r.name.toLowerCase().includes(keyword.toLowerCase())
+      );
+      this.setData({ repos: filtered });
+    }, 300);
   },
 
   // 打开创建仓库弹窗

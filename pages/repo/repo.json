@@ -1,4 +1,5 @@
 {
   "navigationBarTitleText": "仓库",
+  "enablePullDownRefresh": true,
   "usingComponents": {}
 }

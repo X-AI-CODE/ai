@@ -1,5 +1,6 @@
 // pages/workspace-manager/workspace-manager.js - 工作空间管理页
 import { WorkspaceManager } from '../../utils/workspace-manager';
+import { GitStore } from '../../utils/git-store';
 
 Page({
   data: {
@@ -225,7 +226,7 @@ Page({
 
                 // 刷新GitStore
                 const app = getApp();
-                app.globalData.gitStore = new (require('../../utils/git-store').GitStore)();
+                app.globalData.gitStore = new GitStore();
 
                 wx.showToast({ title: '已删除', icon: 'success' });
                 this.loadData();

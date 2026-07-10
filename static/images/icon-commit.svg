@@ -1,0 +1,8 @@
+<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+  <!-- 主线 -->
+  <line x1="32" y1="8" x2="32" y2="56" stroke="#28a745" stroke-width="4" stroke-linecap="round"/>
+  <!-- 提交节点 -->
+  <circle cx="32" cy="16" r="6" fill="#28a745"/>
+  <circle cx="32" cy="32" r="6" fill="#28a745"/>
+  <circle cx="32" cy="48" r="6" fill="#28a745"/>
+</svg>

@@ -1,0 +1,197 @@
+<!--pages/index/index.wxml - 仓库列表页-->
+<view class="container">
+  <!-- 工作空间切换器 -->
+  <view class="workspace-bar" bindtap="showWorkspacePicker">
+    <view class="workspace-info" wx:if="{{currentWorkspace}}">
+      <text class="workspace-icon">{{currentWorkspace.icon}}</text>
+      <view class="workspace-text">
+        <text class="workspace-name">{{currentWorkspace.name}}</text>
+        <text class="workspace-count">{{currentWorkspace.repoCount || 0}} 个仓库</text>
+      </view>
+    </view>
+    <view class="workspace-arrow">
+      <text>切换</text>
+      <text class="arrow-icon">▾</text>
+    </view>
+  </view>
+
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-input-wrap">
+      <text class="search-icon">🔍</text>
+      <input
+        class="search-input"
+        placeholder="搜索仓库..."
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+      />
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-bar">
+    <button class="btn btn-primary" bindtap="showCreateRepo">
+      <text>+ 新建仓库</text>
+    </button>
+    <button class="btn btn-outline" bindtap="cloneFromRemote">
+      <text>📥 从远程克隆</text>
+    </button>
+  </view>
+
+  <!-- 仓库列表 -->
+  <view class="repo-list" wx:if="{{!isEmpty}}">
+    <view
+      class="repo-card card"
+      wx:for="{{repos}}"
+      wx:key="id"
+      bindtap="openRepo"
+      data-id="{{item.id}}"
+    >
+      <view class="repo-card-header">
+        <view class="repo-icon">📁</view>
+        <view class="repo-info">
+          <text class="repo-name">{{item.name}}</text>
+          <view class="repo-meta">
+            <text class="repo-branch">🌿 {{item.currentBranch}}</text>
+            <text class="repo-time">更新于 {{item.updatedAt}}</text>
+          </view>
+        </view>
+        <view class="repo-actions">
+          <text
+            class="action-btn delete-btn"
+            catchtap="deleteRepo"
+            data-id="{{item.id}}"
+            data-name="{{item.name}}"
+          >🗑️</text>
+        </view>
+      </view>
+
+      <!-- 远程仓库标签 -->
+      <view class="repo-remotes" wx:if="{{item.remotes.length > 0}}">
+        <view
+          class="tag tag-blue"
+          wx:for="{{item.remotes}}"
+          wx:for-item="remote"
+          wx:key="name"
+        >
+          {{remote.name}}: {{remote.url}}
+        </view>
+      </view>
+
+      <!-- 仓库状态 -->
+      <view class="repo-status">
+        <text class="status-item" wx:if="{{item.lastSync}}">
+          ✅ 最后同步: 刚刚
+        </text>
+        <text class="status-item text-muted" wx:else>
+          ⏸️ 未同步
+        </text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{isEmpty}}">
+    <text class="empty-icon">📦</text>
+    <text class="empty-text">还没有仓库</text>
+    <text class="empty-desc">创建新仓库或从远程克隆开始使用</text>
+    <view class="empty-actions">
+      <button class="btn btn-primary" bindtap="showCreateRepo">新建仓库</button>
+      <button class="btn btn-outline mt-20" bindtap="cloneFromRemote">从远程克隆</button>
+    </view>
+  </view>
+
+  <!-- 创建仓库弹窗 -->
+  <view class="modal-mask" wx:if="{{showCreateModal}}" bindtap="hideCreateRepo">
+    <view class="modal-content" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">新建仓库</text>
+        <text class="modal-close" bindtap="hideCreateRepo">✕</text>
+      </view>
+
+      <view class="modal-body">
+        <view class="input-group">
+          <text class="input-label">仓库名称 *</text>
+          <input
+            class="input"
+            placeholder="例如: my-project"
+            value="{{newRepoName}}"
+            bindinput="onRepoNameInput"
+          />
+        </view>
+
+        <view class="input-group">
+          <text class="input-label">默认分支</text>
+          <input
+            class="input"
+            placeholder="main"
+            value="{{newRepoDefaultBranch}}"
+            bindinput="onDefaultBranchInput"
+          />
+        </view>
+
+        <view class="input-group">
+          <text class="input-label">作者名称</text>
+          <input
+            class="input"
+            placeholder="Your Name"
+            value="{{newRepoAuthorName}}"
+            bindinput="onAuthorNameInput"
+          />
+        </view>
+
+        <view class="input-group">
+          <text class="input-label">作者邮箱</text>
+          <input
+            class="input"
+            placeholder="you@example.com"
+            value="{{newRepoAuthorEmail}}"
+            bindinput="onAuthorEmailInput"
+          />
+        </view>
+      </view>
+
+      <view class="modal-footer">
+        <button class="btn btn-outline" bindtap="hideCreateRepo">取消</button>
+        <button class="btn btn-primary" bindtap="createRepo">创建</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 工作空间选择器 -->
+  <view class="modal-mask" wx:if="{{showWorkspacePicker}}" bindtap="hideWorkspacePicker">
+    <view class="modal-content modal-bottom" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">选择工作空间</text>
+        <text class="modal-close" bindtap="hideWorkspacePicker">✕</text>
+      </view>
+
+      <view class="workspace-list">
+        <view
+          class="workspace-item {{item.isCurrent ? 'active' : ''}}"
+          wx:for="{{workspaces}}"
+          wx:key="id"
+          bindtap="switchWorkspace"
+          data-id="{{item.id}}"
+        >
+          <view class="workspace-item-left">
+            <text class="workspace-item-icon">{{item.icon}}</text>
+            <view class="workspace-item-info">
+              <text class="workspace-item-name">{{item.name}}</text>
+              <text class="workspace-item-desc" wx:if="{{item.description}}">{{item.description}}</text>
+              <text class="workspace-item-meta">{{item.repoCount || 0}} 个仓库 · {{item.lastAccessedText}}</text>
+            </view>
+          </view>
+          <view class="workspace-item-right">
+            <text class="current-tag" wx:if="{{item.isCurrent}}">当前</text>
+            <view class="workspace-color-dot" style="background: {{item.color}}"></view>
+          </view>
+        </view>
+      </view>
+
+      <view class="modal-footer">
+        <button class="btn btn-outline" bindtap="manageWorkspaces">⚙️ 管理工作空间</button>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,85 @@
+<!--pages/branches/branches.wxml - 分支管理-->
+<view class="container">
+  <!-- 当前分支信息 -->
+  <view class="card current-branch-card">
+    <text class="section-label">当前分支</text>
+    <view class="current-branch-name">
+      <text>🌿 {{currentBranch}}</text>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-row">
+    <button class="btn btn-primary" bindtap="showCreate">+ 新建分支</button>
+  </view>
+
+  <!-- 分支列表 -->
+  <view class="branch-list">
+    <view
+      class="branch-card card"
+      wx:for="{{branches}}"
+      wx:key="name"
+    >
+      <view class="branch-card-header">
+        <view class="branch-name-row">
+          <text class="branch-current-tag" wx:if="{{item.isCurrent}}">当前</text>
+          <text class="branch-name">🌿 {{item.name}}</text>
+        </view>
+        <text class="branch-hash">{{item.hash}}</text>
+      </view>
+
+      <view class="branch-actions" wx:if="{{!item.isCurrent}}">
+        <button
+          class="btn btn-sm btn-primary"
+          catchtap="checkoutBranch"
+          data-branch="{{item.name}}"
+        >切换</button>
+        <button
+          class="btn btn-sm btn-outline"
+          catchtap="mergeBranch"
+          data-branch="{{item.name}}"
+        >合并到当前</button>
+        <button
+          class="btn btn-sm btn-danger"
+          catchtap="deleteBranch"
+          data-branch="{{item.name}}"
+        >删除</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{branches.length === 0 && !loading}}">
+    <text>暂无分支</text>
+  </view>
+
+  <!-- 新建分支弹窗 -->
+  <view class="modal-mask" wx:if="{{showCreateModal}}" bindtap="hideCreate">
+    <view class="modal-content" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">新建分支</text>
+        <text class="modal-close" bindtap="hideCreate">✕</text>
+      </view>
+      <view class="modal-body">
+        <view class="input-group">
+          <text class="input-label">分支名称</text>
+          <input
+            class="input"
+            placeholder="例如: feature/new-feature"
+            value="{{newBranchName}}"
+            bindinput="onBranchNameInput"
+            auto-focus
+          />
+        </view>
+        <view class="input-group">
+          <text class="input-label">基于</text>
+          <text class="base-branch-text">🌿 {{currentBranch}}</text>
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn btn-outline" bindtap="hideCreate">取消</button>
+        <button class="btn btn-primary" bindtap="createBranch">创建</button>
+      </view>
+    </view>
+  </view>
+</view>

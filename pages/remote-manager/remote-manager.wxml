@@ -1,0 +1,263 @@
+<!--pages/remote-manager/remote-manager.wxml - 远程仓库管理-->
+<view class="container">
+  <!-- 克隆模式 -->
+  <block wx:if="{{isCloneMode}}">
+    <view class="card clone-card">
+      <view class="section-title">从远程克隆仓库</view>
+      <view class="input-group mt-20">
+        <text class="input-label">仓库URL</text>
+        <input
+          class="input"
+          placeholder="https://github.com/user/repo.git"
+          value="{{cloneUrl}}"
+          bindinput="onCloneUrlInput"
+        />
+      </view>
+      <view class="input-group">
+        <text class="input-label">本地名称 (可选)</text>
+        <input
+          class="input"
+          placeholder="默认使用仓库名"
+          value="{{cloneTargetPath}}"
+          bindinput="onClonePathInput"
+        />
+      </view>
+      <button
+        class="btn btn-primary btn-block mt-20"
+        bindtap="cloneRepo"
+        disabled="{{cloning}}"
+      >
+        {{cloning ? '克隆中...' : '📥 开始克隆'}}
+      </button>
+
+      <!-- 克隆进度 -->
+      <view class="clone-progress" wx:if="{{cloning}}">
+        <view class="progress-bar">
+          <view class="progress-fill" style="width: {{cloneProgress}}%"></view>
+        </view>
+        <text class="progress-text">{{cloneProgress}}%</text>
+      </view>
+    </view>
+
+    <!-- 已配置的远程仓库快速克隆 -->
+    <view class="card" wx:if="{{globalRemotes.length > 0}}">
+      <view class="section-title">已配置的仓库</view>
+      <view
+        class="remote-quick-item"
+        wx:for="{{globalRemotes}}"
+        wx:key="id"
+        bindtap="cloneFromGlobal"
+        data-id="{{item.id}}"
+      >
+        <view class="remote-service-badge">{{item.service}}</view>
+        <view class="remote-quick-info">
+          <text class="remote-quick-name">{{item.name}}</text>
+          <text class="remote-quick-url text-small text-muted">{{item.url}}</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 管理远程模式 -->
+  <block wx:else>
+    <!-- 仓库关联的远程 -->
+    <view class="section-title">仓库远程 ({{repoRemotes.length}})</view>
+
+    <view
+      class="remote-card card"
+      wx:for="{{repoRemotes}}"
+      wx:key="name"
+    >
+      <view class="remote-card-header">
+        <view class="remote-name-badge">{{item.name}}</view>
+        <text class="remote-url text-small">{{item.url}}</text>
+      </view>
+      <view class="remote-card-meta">
+        <text class="text-muted text-small">添加于: {{item.addedAt}}</text>
+      </view>
+    </view>
+
+    <view class="empty-hint" wx:if="{{repoRemotes.length === 0}}">
+      <text>暂未配置远程仓库</text>
+    </view>
+
+    <view class="divider"></view>
+
+    <!-- 全局远程仓库 -->
+    <view class="section-title">全局远程仓库 ({{globalRemotes.length}})</view>
+
+    <view
+      class="remote-card card"
+      wx:for="{{globalRemotes}}"
+      wx:key="id"
+    >
+      <view class="remote-card-header">
+        <view class="remote-info-left">
+          <view class="remote-service-tag tag-{{item.service}}">
+            {{item.service}}
+          </view>
+          <view class="remote-name-text">
+            <text class="remote-name">{{item.name}}</text>
+            <text class="remote-url text-small text-muted">{{item.url}}</text>
+          </view>
+        </view>
+        <view class="remote-status {{item.status === 'syncing' ? 'syncing' : ''}}">
+          <text wx:if="{{item.status === 'syncing'}}">⏳</text>
+          <text wx:elif="{{item.status === 'error'}}">❌</text>
+          <text wx:else>✅</text>
+        </view>
+      </view>
+
+      <view class="remote-card-meta">
+        <text class="text-muted text-small" wx:if="{{item.lastSync}}">
+          最后同步: {{item.lastSync}}
+        </text>
+        <text class="text-muted text-small" wx:else>从未同步</text>
+      </view>
+
+      <view class="remote-actions">
+        <button
+          class="btn btn-sm btn-outline"
+          catchtap="testConnection"
+          data-id="{{item.id}}"
+          disabled="{{testing}}"
+        >测试连接</button>
+        <button
+          class="btn btn-sm btn-primary"
+          catchtap="syncRemote"
+          data-id="{{item.id}}"
+        >同步</button>
+        <button
+          class="btn btn-sm btn-danger"
+          catchtap="removeRemote"
+          data-id="{{item.id}}"
+          data-name="{{item.name}}"
+        >移除</button>
+      </view>
+    </view>
+
+    <view class="empty-hint" wx:if="{{globalRemotes.length === 0}}">
+      <text>暂未配置全局远程仓库</text>
+    </view>
+
+    <!-- 添加按钮 -->
+    <view class="add-remote-btn">
+      <button class="btn btn-primary btn-block" bindtap="showAddRemote">
+        + 添加远程仓库
+      </button>
+    </view>
+  </block>
+
+  <!-- 添加远程弹窗 -->
+  <view class="modal-mask" wx:if="{{showAddModal}}" bindtap="hideAddRemote">
+    <view class="modal-content" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">添加远程仓库</text>
+        <text class="modal-close" bindtap="hideAddRemote">✕</text>
+      </view>
+      <view class="modal-body">
+        <view class="input-group">
+          <text class="input-label">名称 *</text>
+          <input
+            class="input"
+            placeholder="例如: origin"
+            value="{{formData.name}}"
+            data-field="name"
+            bindinput="onFormInput"
+          />
+        </view>
+        <view class="input-group">
+          <text class="input-label">URL *</text>
+          <input
+            class="input"
+            placeholder="https://github.com/user/repo.git"
+            value="{{formData.url}}"
+            data-field="url"
+            bindinput="onFormInput"
+          />
+        </view>
+        <view class="input-group">
+          <text class="input-label">Token (私有仓库需要)</text>
+          <input
+            class="input"
+            placeholder="访问令牌"
+            password
+            value="{{formData.token}}"
+            data-field="token"
+            bindinput="onFormInput"
+          />
+        </view>
+        <view class="input-group">
+          <text class="input-label">默认分支</text>
+          <input
+            class="input"
+            placeholder="main"
+            value="{{formData.branch}}"
+            data-field="branch"
+            bindinput="onFormInput"
+          />
+        </view>
+        <view class="switch-row">
+          <text class="input-label">自动同步</text>
+          <switch checked="{{formData.autoSync}}" bindchange="onAutoSyncChange" />
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn btn-outline" bindtap="hideAddRemote">取消</button>
+        <button
+          class="btn btn-primary"
+          bindtap="{{repoId ? 'addRemoteToRepo' : 'addGlobalRemote'}}"
+        >添加</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 远程详情弹窗 -->
+  <view class="modal-mask" wx:if="{{showRemoteDetail}}" bindtap="hideRemoteDetail">
+    <view class="modal-content modal-large" catchtap="">
+      <view class="modal-header">
+        <text class="modal-title">远程仓库信息</text>
+        <text class="modal-close" bindtap="hideRemoteDetail">✕</text>
+      </view>
+      <view class="modal-body" wx:if="{{remoteInfo}}">
+        <view class="info-row">
+          <text class="info-label">名称</text>
+          <text class="info-value">{{remoteInfo.fullName || remoteInfo.name}}</text>
+        </view>
+        <view class="info-row" wx:if="{{remoteInfo.description}}">
+          <text class="info-label">描述</text>
+          <text class="info-value">{{remoteInfo.description}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">默认分支</text>
+          <text class="info-value">{{remoteInfo.defaultBranch}}</text>
+        </view>
+        <view class="info-row" wx:if="{{remoteInfo.stars}}">
+          <text class="info-label">⭐ Stars</text>
+          <text class="info-value">{{remoteInfo.stars}}</text>
+        </view>
+        <view class="info-row" wx:if="{{remoteInfo.forks}}">
+          <text class="info-label">🍴 Forks</text>
+          <text class="info-value">{{remoteInfo.forks}}</text>
+        </view>
+        <view class="info-row" wx:if="{{remoteInfo.language}}">
+          <text class="info-label">语言</text>
+          <text class="info-value">{{remoteInfo.language}}</text>
+        </view>
+
+        <!-- 分支列表 -->
+        <view class="branch-section" wx:if="{{remoteBranches.length > 0}}">
+          <text class="section-title mt-20">远程分支</text>
+          <view
+            class="remote-branch-item"
+            wx:for="{{remoteBranches}}"
+            wx:key="name"
+          >
+            <text>🌿 {{item.name}}</text>
+            <text class="tag tag-blue" wx:if="{{item.protected}}">protected</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

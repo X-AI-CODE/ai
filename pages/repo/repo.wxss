@@ -1,0 +1,353 @@
+/* pages/repo/repo.wxss */
+
+.repo-header {
+  margin-bottom: 20rpx;
+}
+
+.repo-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.repo-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #24292e;
+}
+
+.branch-badge {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 16rpx;
+  background: #dbedff;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  color: #0366d6;
+}
+
+.branch-badge .arrow {
+  font-size: 18rpx;
+  margin-left: 8rpx;
+}
+
+.repo-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.action-group {
+  display: flex;
+  gap: 8rpx;
+}
+
+/* 标签栏 */
+.tab-bar {
+  display: flex;
+  background: #ffffff;
+  border-bottom: 2rpx solid #e1e4e8;
+  margin-bottom: 20rpx;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx;
+  font-size: 28rpx;
+  color: #586069;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.tab-item.active {
+  color: #0366d6;
+  font-weight: 600;
+  border-bottom: 4rpx solid #0366d6;
+}
+
+.tab-badge {
+  background: #d73a49;
+  color: #ffffff;
+  font-size: 20rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 20rpx;
+  margin-left: 8rpx;
+}
+
+/* 面包屑 */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 20rpx;
+  background: #f6f8fa;
+  border-radius: 8rpx;
+  margin-bottom: 16rpx;
+  font-size: 26rpx;
+  color: #586069;
+}
+
+.breadcrumb-item {
+  color: #0366d6;
+  margin-right: 12rpx;
+}
+
+.breadcrumb-path {
+  color: #24292e;
+  font-weight: 500;
+}
+
+/* 文件列表 */
+.file-list {
+  padding: 0;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 24rpx;
+  border-bottom: 1rpx solid #eaecef;
+  transition: background 0.15s;
+}
+
+.file-item:last-child {
+  border-bottom: none;
+}
+
+.file-item:active {
+  background: #f6f8fa;
+}
+
+.file-icon {
+  font-size: 36rpx;
+  margin-right: 16rpx;
+  width: 48rpx;
+  text-align: center;
+}
+
+.file-info {
+  flex: 1;
+}
+
+.file-name {
+  font-size: 28rpx;
+  color: #24292e;
+  display: block;
+}
+
+.file-size {
+  font-size: 22rpx;
+  color: #959da5;
+  margin-top: 4rpx;
+}
+
+/* 状态页 */
+.status-section {
+  margin-bottom: 20rpx;
+}
+
+.section-header {
+  margin-bottom: 16rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.change-item {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.change-type {
+  width: 36rpx;
+  height: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: 700;
+  border-radius: 6rpx;
+  margin-right: 12rpx;
+}
+
+.type-added {
+  background: #dcffe4;
+  color: #22863a;
+}
+
+.type-modified {
+  background: #fff5b1;
+  color: #735c0f;
+}
+
+.type-deleted {
+  background: #ffdce0;
+  color: #d73a49;
+}
+
+.type-untracked {
+  background: #e1e4e8;
+  color: #586069;
+}
+
+.change-path {
+  flex: 1;
+  font-size: 26rpx;
+  color: #24292e;
+  font-family: monospace;
+}
+
+.unstage-btn {
+  font-size: 28rpx;
+  color: #d73a49;
+  padding: 8rpx 12rpx;
+}
+
+.checkbox {
+  width: 32rpx;
+  height: 32rpx;
+  border: 2rpx solid #d1d5da;
+  border-radius: 6rpx;
+  margin-right: 12rpx;
+}
+
+.checkbox.checked {
+  background: #0366d6;
+  border-color: #0366d6;
+}
+
+/* 提交列表 */
+.commit-item {
+  margin-bottom: 12rpx;
+}
+
+.commit-info {
+  flex: 1;
+}
+
+.commit-message {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #24292e;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.commit-meta {
+  display: flex;
+  gap: 16rpx;
+  font-size: 22rpx;
+  color: #586069;
+}
+
+.commit-hash {
+  font-family: monospace;
+  background: #f1f1f1;
+  padding: 2rpx 8rpx;
+  border-radius: 4rpx;
+  color: #0366d6;
+}
+
+/* 分支列表 */
+.branch-list {
+  max-height: 600rpx;
+  overflow-y: auto;
+}
+
+.branch-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  border-bottom: 1rpx solid #eaecef;
+}
+
+.branch-item.current {
+  background: #f0f8ff;
+}
+
+.branch-icon {
+  margin-right: 16rpx;
+  font-size: 28rpx;
+}
+
+.branch-name {
+  flex: 1;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.branch-hash {
+  font-size: 22rpx;
+  color: #586069;
+  font-family: monospace;
+}
+
+/* 暂存列表 */
+.stash-list {
+  margin-top: 20rpx;
+}
+
+.stash-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #eaecef;
+}
+
+.stash-info {
+  flex: 1;
+}
+
+.stash-msg {
+  font-size: 26rpx;
+  display: block;
+}
+
+.stash-time {
+  display: block;
+  margin-top: 4rpx;
+}
+
+/* 提交弹窗 */
+.commit-textarea {
+  width: 100%;
+  min-height: 160rpx;
+  padding: 16rpx 20rpx;
+  border: 1rpx solid #e1e4e8;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.staged-summary {
+  margin-top: 12rpx;
+}
+
+/* 弹窗底部弹出 */
+.modal-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 100%;
+  border-radius: 24rpx 24rpx 0 0;
+}
+
+/* 空提示 */
+.empty-hint {
+  padding: 32rpx;
+  text-align: center;
+  color: #959da5;
+  font-size: 26rpx;
+}

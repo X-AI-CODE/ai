@@ -1,0 +1,74 @@
+/* pages/branches/branches.wxss */
+
+.current-branch-card {
+  margin-bottom: 20rpx;
+}
+
+.section-label {
+  font-size: 24rpx;
+  color: #586069;
+  text-transform: uppercase;
+  letter-spacing: 1rpx;
+  margin-bottom: 8rpx;
+}
+
+.current-branch-name {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #24292e;
+}
+
+.action-row {
+  margin-bottom: 24rpx;
+}
+
+.branch-card {
+  margin-bottom: 16rpx;
+}
+
+.branch-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.branch-name-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.branch-current-tag {
+  font-size: 22rpx;
+  background: #28a745;
+  color: #ffffff;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+}
+
+.branch-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #24292e;
+}
+
+.branch-hash {
+  font-size: 22rpx;
+  color: #586069;
+  font-family: monospace;
+}
+
+.branch-actions {
+  display: flex;
+  gap: 12rpx;
+  padding-top: 12rpx;
+  border-top: 1rpx solid #eaecef;
+}
+
+.base-branch-text {
+  font-size: 28rpx;
+  color: #24292e;
+  display: block;
+  padding: 12rpx 0;
+}

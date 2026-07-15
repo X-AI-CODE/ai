@@ -1,0 +1,279 @@
+/* pages/workspace-manager/workspace-manager.wxss */
+
+.intro-card {
+  margin-bottom: 24rpx;
+  background: linear-gradient(135deg, #f6f8fa 0%, #ffffff 100%);
+}
+
+.intro-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.intro-desc {
+  font-size: 26rpx;
+  color: #586069;
+  line-height: 1.6;
+}
+
+.section-header {
+  margin-bottom: 16rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #24292e;
+}
+
+/* 工作空间卡片 */
+.workspace-card {
+  margin-bottom: 16rpx;
+  transition: all 0.2s;
+}
+
+.workspace-card.is-current {
+  border-color: #0366d6;
+  box-shadow: 0 0 0 2rpx rgba(3, 102, 214, 0.1);
+}
+
+.workspace-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.workspace-card-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.workspace-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16rpx;
+  border: 2rpx solid;
+  font-size: 40rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.workspace-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.workspace-card-name-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.workspace-card-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #24292e;
+}
+
+.current-badge {
+  font-size: 20rpx;
+  background: #28a745;
+  color: #ffffff;
+  padding: 2rpx 10rpx;
+  border-radius: 4rpx;
+}
+
+.workspace-card-desc {
+  font-size: 26rpx;
+  color: #586069;
+  display: block;
+  margin-top: 6rpx;
+}
+
+.workspace-card-stats {
+  display: flex;
+  gap: 8rpx;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #959da5;
+}
+
+.workspace-card-actions {
+  display: flex;
+  gap: 12rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #eaecef;
+}
+
+/* 模板网格 */
+.template-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+  margin-top: 16rpx;
+}
+
+.template-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24rpx;
+  background: #ffffff;
+  border: 1rpx solid #e1e4e8;
+  border-radius: 12rpx;
+  transition: all 0.2s;
+}
+
+.template-card:active {
+  transform: scale(0.96);
+  border-color: #0366d6;
+  background: #f0f8ff;
+}
+
+.template-icon {
+  font-size: 48rpx;
+  margin-bottom: 8rpx;
+}
+
+.template-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #24292e;
+  margin-bottom: 4rpx;
+}
+
+.template-desc {
+  font-size: 22rpx;
+  color: #586069;
+  text-align: center;
+}
+
+/* 图标选择器 */
+.icon-selector {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 20rpx;
+  background: #f6f8fa;
+  border-radius: 8rpx;
+  border: 1rpx solid #e1e4e8;
+}
+
+.selected-icon {
+  font-size: 40rpx;
+  margin-right: 16rpx;
+}
+
+.select-hint {
+  font-size: 26rpx;
+  color: #0366d6;
+}
+
+/* 颜色选择器 */
+.color-selector {
+  display: flex;
+  gap: 16rpx;
+  flex-wrap: wrap;
+}
+
+.color-option {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  border: 3rpx solid transparent;
+  transition: all 0.15s;
+}
+
+.color-option.selected {
+  border-color: #24292e;
+  transform: scale(1.15);
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.2);
+}
+
+/* 图标网格 */
+.icon-picker-content {
+  width: 85%;
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12rpx;
+  padding: 20rpx 30rpx 30rpx;
+}
+
+.icon-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 12rpx;
+  border: 2rpx solid #e1e4e8;
+  font-size: 40rpx;
+  transition: all 0.15s;
+}
+
+.icon-option:active,
+.icon-option.selected {
+  border-color: #0366d6;
+  background: #f0f8ff;
+}
+
+/* Modal */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  width: 85%;
+  max-width: 600rpx;
+  background: #ffffff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #e1e4e8;
+}
+
+.modal-title {
+  font-size: 34rpx;
+  font-weight: 600;
+}
+
+.modal-close {
+  font-size: 36rpx;
+  color: #586069;
+  padding: 8rpx;
+}
+
+.modal-body {
+  padding: 30rpx;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16rpx;
+  padding: 20rpx 30rpx 30rpx;
+}

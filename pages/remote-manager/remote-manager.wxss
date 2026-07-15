@@ -1,0 +1,221 @@
+/* pages/remote-manager/remote-manager.wxss */
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #24292e;
+  margin-bottom: 16rpx;
+}
+
+/* 克隆卡片 */
+.clone-card {
+  margin-bottom: 24rpx;
+}
+
+.clone-progress {
+  margin-top: 20rpx;
+}
+
+.progress-bar {
+  height: 12rpx;
+  background: #e1e4e8;
+  border-radius: 6rpx;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #0366d6;
+  border-radius: 6rpx;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  display: block;
+  text-align: center;
+  font-size: 24rpx;
+  color: #586069;
+  margin-top: 8rpx;
+}
+
+/* 快速克隆 */
+.remote-quick-item {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #eaecef;
+}
+
+.remote-quick-item:active {
+  background: #f6f8fa;
+}
+
+.remote-service-badge {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f1f1;
+  border-radius: 8rpx;
+  font-size: 20rpx;
+  font-weight: 600;
+  margin-right: 16rpx;
+  text-transform: uppercase;
+}
+
+.remote-quick-info {
+  flex: 1;
+}
+
+.remote-quick-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  display: block;
+}
+
+.remote-quick-url {
+  display: block;
+  margin-top: 4rpx;
+}
+
+/* 远程卡片 */
+.remote-card {
+  margin-bottom: 16rpx;
+}
+
+.remote-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.remote-info-left {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.remote-service-tag {
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+  font-size: 20rpx;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.tag-github { background: #24292e; color: #ffffff; }
+.tag-gitlab { background: #FC6D26; color: #ffffff; }
+.tag-gitee { background: #C71D23; color: #ffffff; }
+
+.remote-name-text {
+  flex: 1;
+}
+
+.remote-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  display: block;
+}
+
+.remote-url {
+  display: block;
+  margin-top: 4rpx;
+  word-break: break-all;
+}
+
+.remote-name-badge {
+  display: inline-flex;
+  padding: 4rpx 16rpx;
+  background: #0366d6;
+  color: #ffffff;
+  border-radius: 6rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+}
+
+.remote-card-meta {
+  margin-bottom: 12rpx;
+}
+
+.remote-status.syncing {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.remote-actions {
+  display: flex;
+  gap: 12rpx;
+  padding-top: 12rpx;
+  border-top: 1rpx solid #eaecef;
+}
+
+/* 添加按钮 */
+.add-remote-btn {
+  margin-top: 24rpx;
+}
+
+/* 开关行 */
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12rpx 0;
+}
+
+/* 远程详情 */
+.modal-large {
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.info-row {
+  display: flex;
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.info-label {
+  width: 160rpx;
+  font-size: 26rpx;
+  color: #586069;
+}
+
+.info-value {
+  flex: 1;
+  font-size: 26rpx;
+  color: #24292e;
+}
+
+.branch-section {
+  margin-top: 20rpx;
+}
+
+.remote-branch-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid #f6f8fa;
+  font-size: 26rpx;
+}
+
+/* 空状态和辅助 */
+.empty-hint {
+  text-align: center;
+  padding: 32rpx;
+  color: #959da5;
+  font-size: 26rpx;
+}
+
+.divider {
+  height: 1rpx;
+  background: #e1e4e8;
+  margin: 24rpx 0;
+}

@@ -9,6 +9,7 @@ import { EconomyManager } from '../economy/EconomyManager.js';
 import { Bloodline } from '../family/Bloodline.js';
 import { ArtifactManager } from '../family/Artifact.js';
 import { TournamentEngine } from '../event/TournamentEngine.js';
+import { AncestralTree } from '../family/AncestralTree.js';
 
 export class GameContext {
   constructor() {
@@ -56,6 +57,7 @@ export class GameContext {
     this.bloodline = null;
     this.artifactManager = new ArtifactManager();
     this.tournamentEngine = new TournamentEngine();
+    this.ancestralTree = new AncestralTree();
     this.uiManager = null;
     this.sceneManager = null;
     this.audioManager = null;
@@ -226,7 +228,8 @@ export class GameContext {
       familyData: this.familyManager ? this.familyManager.toJSON() : null,
       economyData: this.economyManager ? this.economyManager.toJSON() : null,
       bloodlineData: this.bloodline ? this.bloodline.toJSON() : null,
-      artifactData: this.artifactManager ? this.artifactManager.toJSON() : null
+      artifactData: this.artifactManager ? this.artifactManager.toJSON() : null,
+      ancestralData: this.ancestralTree ? this.ancestralTree.toJSON() : null
     };
   }
 
@@ -266,6 +269,10 @@ export class GameContext {
     if (data.artifactData) {
       if (!this.artifactManager) this.artifactManager = new ArtifactManager();
       this.artifactManager.fromJSON(data.artifactData);
+    }
+    if (data.ancestralData) {
+      if (!this.ancestralTree) this.ancestralTree = new AncestralTree();
+      this.ancestralTree.fromJSON(data.ancestralData);
     }
   }
 }

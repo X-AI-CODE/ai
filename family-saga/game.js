@@ -15,6 +15,7 @@ import { BattleManager } from './src/battle/BattleManager.js';
 import { EventEngine } from './src/event/EventEngine.js';
 import { AdManager } from './src/ad/AdManager.js';
 import { StorageManager } from './src/storage/StorageManager.js';
+import { OfflineIdle } from './src/economy/OfflineIdle.js';
 import { UIManager } from './src/ui/UIManager.js';
 
 class GameMain {
@@ -63,8 +64,16 @@ class GameMain {
         cancelText: '全新开创',
         success: (res) => {
           if (res && res.confirm) {
-            StorageManager.loadGame(this.context);
+            const loadRes = StorageManager.loadGame(this.context);
             Adapter.showToast(`欢迎回来，当代家主！当前第 ${this.context.year} 年`);
+            if (loadRes && loadRes.saveTime) {
+              const offInfo = OfflineIdle.calculateOfflineIncome(this.context, loadRes.saveTime);
+              if (offInfo) {
+                setTimeout(() => {
+                  if (this.uiManager) this.uiManager.openModal('OfflineUI', offInfo);
+                }, 500);
+              }
+            }
             this.startLoop();
           } else {
             this.showRouteSelection();

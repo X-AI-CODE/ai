@@ -18,6 +18,8 @@ import { AssignMemberUI } from './AssignMemberUI.js';
 import { SocialUI } from './SocialUI.js';
 import { ArtifactUI } from './ArtifactUI.js';
 import { TournamentUI } from './TournamentUI.js';
+import { OfflineUI } from './OfflineUI.js';
+import { AncestralUI } from './AncestralUI.js';
 
 export class UIManager {
   constructor(context) {
@@ -180,6 +182,10 @@ export class UIManager {
         ArtifactUI.render(this.ctx, this.width, this.height, this.context, this);
       } else if (this.activeModal === 'TournamentUI') {
         TournamentUI.render(this.ctx, this.width, this.height, this.context, this, this.modalData);
+      } else if (this.activeModal === 'OfflineUI') {
+        OfflineUI.render(this.ctx, this.width, this.height, this.context, this, this.modalData);
+      } else if (this.activeModal === 'AncestralUI') {
+        AncestralUI.render(this.ctx, this.width, this.height, this.context, this);
       } else if (this.activeModal === 'AdSimModal') {
         this.renderAdSimModal();
       }

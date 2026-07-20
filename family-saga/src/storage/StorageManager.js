@@ -25,7 +25,7 @@ export class StorageManager {
     const data = Adapter.getStorage(SAVE_KEY, null);
     if (!data) return false;
     context.fromJSON(data);
-    return true;
+    return { success: true, saveTime: data.saveTime || Date.now() };
   }
 
   // 检查是否存在存档

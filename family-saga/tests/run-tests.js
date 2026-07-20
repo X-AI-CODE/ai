@@ -15,6 +15,7 @@ import { EventEngine } from '../src/event/EventEngine.js';
 import { AdManager } from '../src/ad/AdManager.js';
 import { StorageManager } from '../src/storage/StorageManager.js';
 import { ResourceLoop } from '../src/economy/ResourceLoop.js';
+import { OfflineIdle } from '../src/economy/OfflineIdle.js';
 
 console.log('====================================================');
 console.log('   家族修仙/官路 (Family Saga) 自动化回归测试启动   ');
@@ -180,6 +181,25 @@ const r1 = artContext.tournamentEngine.runNextRound(artContext);
 assert.strictEqual(r1.success, true, '第一赛程角逐应该正常执行并返回赛报！');
 console.log(`  ✔ 镇族至宝精炼升阶 (+${Math.floor(mirror.getPowerMultiplier() * 100)}%战力) 与十年赛大比角逐 (${r1.roundName}) 100% 校验成功！`);
 
+// === 测试7：离线挂机闭关与千秋祖训基因洗练天赋树 ===
+console.log('\n[Test 7] 离线挂机闭关与千秋祖训基因洗练天赋树');
+const offContext = createTestContext('xianxia');
+const pastTime = Date.now() - 3600000 * 5; // 离线 5 小时
+const offInfo = OfflineIdle.calculateOfflineIncome(offContext, pastTime);
+assert.ok(offInfo, '离线满 5 小时应精准计算离线挂机大赏');
+assert.strictEqual(offInfo.hours, 5, '离线时长应当计算为 5 小时');
+const stones0 = offContext.spiritStones;
+OfflineIdle.claimOfflineIncome(offContext, offInfo, 3); // 3倍广告大赏
+assert.ok(offContext.spiritStones > stones0, '离线物资入库并 3 倍翻倍应当成功');
+
+// 测试祖训天赋树升级
+const at = offContext.ancestralTree;
+offContext.bloodline.exp = 2000;
+const okUpAt = at.upgradeEdict('wealth_edict', offContext);
+assert.strictEqual(okUpAt, true, '点亮第一级商道聚鼎祖训应当成功');
+assert.strictEqual(at.getWealthMultiplier(), 0.12, '全境基础财富产出应当永久提高 +12%');
+console.log(`  ✔ 离线闭关挂机大礼 (+${offInfo.currencyAmount * 3}灵石) 与祖训基因洗练树 (+12%产出) 100% 校验成功！`);
+
 console.log('\n====================================================');
-console.log('        🎉 所有 6 大综合集成回归测试 100% 通过！     ');
+console.log('        🎉 所有 7 大综合集成回归测试 100% 通过！     ');
 console.log('====================================================\n');

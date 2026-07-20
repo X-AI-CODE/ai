@@ -63,7 +63,13 @@ export class BloodlineUI {
     ctx.font = 'bold 13px sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('★ 里程碑系统 (达成立刻提升血脉经验并解锁游戏新玩法与关卡)：', pad + 18, msStart + 20);
+    ctx.restore();
 
+    uiManager.drawButton(width - 135, msStart + 8, 115, 26, '📜 祖训/基因树', () => {
+      uiManager.openModal('AncestralUI');
+    }, '#9333ea', '#ffffff', 12);
+
+    ctx.save();
     let row = 0;
     let col = 0;
     MILESTONES_CONFIG.forEach((ms) => {

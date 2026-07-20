@@ -26,8 +26,12 @@ export class ResourceLoop {
     // 广告加速倍率 (例如 2倍)
     const adMultiplier = context && context.adBonuses ? (context.adBonuses.productionMultiplier || 1) : 1;
 
-    // 综合产出 = 基础 × (1 + 族人加成) × 广告倍率
-    const finalAmount = Math.floor(baseAmount * (1 + memberBonus) * adMultiplier);
+    // 祖训树与法宝加成倍率
+    const ancestralBonus = context && context.ancestralTree ? context.ancestralTree.getWealthMultiplier() : 0;
+    const artifactBonus = context && context.artifactManager ? context.artifactManager.getTotalProdBonus() : 0;
+
+    // 综合产出 = 基础 × (1 + 族人加成 + 祖训加成 + 法宝加成) × 广告倍率
+    const finalAmount = Math.floor(baseAmount * (1 + memberBonus + ancestralBonus + artifactBonus) * adMultiplier);
 
     return {
       type: cfg.outputType,

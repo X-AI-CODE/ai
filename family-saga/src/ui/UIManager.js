@@ -16,6 +16,8 @@ import { AdModalUI } from './AdModalUI.js';
 import { BattleUI } from './BattleUI.js';
 import { AssignMemberUI } from './AssignMemberUI.js';
 import { SocialUI } from './SocialUI.js';
+import { ArtifactUI } from './ArtifactUI.js';
+import { TournamentUI } from './TournamentUI.js';
 
 export class UIManager {
   constructor(context) {
@@ -174,6 +176,10 @@ export class UIManager {
         AssignMemberUI.render(this.ctx, this.width, this.height, this.context, this, this.modalData);
       } else if (this.activeModal === 'SocialUI') {
         SocialUI.render(this.ctx, this.width, this.height, this.context, this);
+      } else if (this.activeModal === 'ArtifactUI') {
+        ArtifactUI.render(this.ctx, this.width, this.height, this.context, this);
+      } else if (this.activeModal === 'TournamentUI') {
+        TournamentUI.render(this.ctx, this.width, this.height, this.context, this, this.modalData);
       } else if (this.activeModal === 'AdSimModal') {
         this.renderAdSimModal();
       }

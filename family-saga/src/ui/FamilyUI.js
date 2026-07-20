@@ -28,13 +28,17 @@ export class FamilyUI {
 
     // 顶部操作栏按钮
     const moneyCost = context.route === 'xianxia' ? '150灵石' : '200银两';
-    uiManager.drawButton(pad + 12, topY + 36, 150, 28, `💞 联姻(20声望+${moneyCost})`, () => {
+    uiManager.drawButton(pad + 12, topY + 36, 110, 28, `💞 联姻(${moneyCost})`, () => {
       if (family.marryNewSpouse(context)) {
         uiManager.refreshHUD();
       }
     }, '#c71585', '#ffffff', 12);
 
-    uiManager.drawButton(width - pad - 162, topY + 36, 150, 28, '👶 繁衍/培育后代', () => {
+    uiManager.drawButton(width / 2 - 55, topY + 36, 110, 28, '🛡 传家至宝/神兽', () => {
+      uiManager.openModal('ArtifactUI');
+    }, '#d97706', '#ffffff', 12);
+
+    uiManager.drawButton(width - pad - 122, topY + 36, 110, 28, '👶 繁衍培育后代', () => {
       const spouseCount = family.getMembersByRole('spouse').length;
       if (spouseCount === 0) {
         Adapter.showToast('请先为家主完成联姻娶妻！');

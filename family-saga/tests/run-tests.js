@@ -163,6 +163,23 @@ assert.strictEqual(loadedContext.spiritStones, simContext.spiritStones);
 assert.strictEqual(loadedContext.familyManager.getMaster().name, newMaster.name);
 console.log(`  ✔ 存档与读入完全一致！(代数: 第${loadedContext.generation}代 | 灵石: ${loadedContext.spiritStones})`);
 
+// === 测试6：镇族传家法宝与十年一届万仙大会/殿试争霸 ===
+console.log('\n[Test 6] 镇族至宝/智囊名录与十年一届万仙大比赛季争霸');
+const artContext = createTestContext('xianxia');
+assert.ok(artContext.artifactManager.getArtifactList().length > 0, '创角应自动获得初始传家至宝');
+const mirror = artContext.artifactManager.getArtifactList()[0];
+const baseMult = mirror.getPowerMultiplier();
+mirror.level += 1;
+assert.ok(mirror.getPowerMultiplier() > baseMult, '精炼升阶后综合战力加成倍率应当增加');
+
+// 将年份推进至第10年触发万仙大会
+artContext.year = 10;
+const tInstance = artContext.tournamentEngine.checkTournamentYear(artContext);
+assert.ok(tInstance, '第10年应精准触发修真万仙大会赛！');
+const r1 = artContext.tournamentEngine.runNextRound(artContext);
+assert.strictEqual(r1.success, true, '第一赛程角逐应该正常执行并返回赛报！');
+console.log(`  ✔ 镇族至宝精炼升阶 (+${Math.floor(mirror.getPowerMultiplier() * 100)}%战力) 与十年赛大比角逐 (${r1.roundName}) 100% 校验成功！`);
+
 console.log('\n====================================================');
-console.log('        🎉 所有 5 大综合集成回归测试 100% 通过！     ');
+console.log('        🎉 所有 6 大综合集成回归测试 100% 通过！     ');
 console.log('====================================================\n');

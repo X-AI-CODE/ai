@@ -247,6 +247,11 @@ export class FamilyManager {
       bloodline.stats.totalHeirsInherited += 1;
     }
 
+    // 转移镇族法宝至宝
+    if (context.artifactManager && oldMaster) {
+      context.artifactManager.inheritToHeir(oldMaster.id, heir.id, context);
+    }
+
     // 重置传承广告加成状态
     context.adBonuses.inheritedExtra = false;
 

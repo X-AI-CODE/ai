@@ -7,6 +7,8 @@ import { Adapter } from './Adapter.js';
 import { FamilyManager } from '../family/FamilyManager.js';
 import { EconomyManager } from '../economy/EconomyManager.js';
 import { Bloodline } from '../family/Bloodline.js';
+import { ArtifactManager } from '../family/Artifact.js';
+import { TournamentEngine } from '../event/TournamentEngine.js';
 
 export class GameContext {
   constructor() {
@@ -52,6 +54,8 @@ export class GameContext {
     this.battleManager = null;
     this.eventEngine = null;
     this.bloodline = null;
+    this.artifactManager = new ArtifactManager();
+    this.tournamentEngine = new TournamentEngine();
     this.uiManager = null;
     this.sceneManager = null;
     this.audioManager = null;
@@ -61,6 +65,7 @@ export class GameContext {
 
   initRoute(route = 'xianxia') {
     this.route = route;
+    if (this.artifactManager) this.artifactManager.initRoute(route);
     if (route === 'xianxia') {
       this.spiritStones = 1200 + (this.bloodline ? this.bloodline.level * 300 : 0);
       this.manuals = 2;
@@ -172,8 +177,13 @@ export class GameContext {
     const resName = this.route === 'xianxia' ? '灵石' : '银两';
     this.addLog(`第${this.year}年：春去秋来，领地岁收增加 ${annualIncome} ${resName}。`);
 
-    // 触发年度随机事件
-    if (!heirTriggered && this.eventEngine) {
+    // 触发年度随机事件或十年一届万仙大比
+    if (!heirTriggered && this.tournamentEngine) {
+      const isTournament = this.tournamentEngine.checkTournamentYear(this);
+      if (!isTournament && this.eventEngine) {
+        this.eventEngine.triggerAnnualEvent(this);
+      }
+    } else if (!heirTriggered && this.eventEngine) {
       this.eventEngine.triggerAnnualEvent(this);
     }
 
@@ -215,7 +225,8 @@ export class GameContext {
       adBonuses: this.adBonuses,
       familyData: this.familyManager ? this.familyManager.toJSON() : null,
       economyData: this.economyManager ? this.economyManager.toJSON() : null,
-      bloodlineData: this.bloodline ? this.bloodline.toJSON() : null
+      bloodlineData: this.bloodline ? this.bloodline.toJSON() : null,
+      artifactData: this.artifactManager ? this.artifactManager.toJSON() : null
     };
   }
 
@@ -251,6 +262,10 @@ export class GameContext {
     if (data.bloodlineData) {
       if (!this.bloodline) this.bloodline = new Bloodline();
       this.bloodline.fromJSON(data.bloodlineData);
+    }
+    if (data.artifactData) {
+      if (!this.artifactManager) this.artifactManager = new ArtifactManager();
+      this.artifactManager.fromJSON(data.artifactData);
     }
   }
 }

@@ -16,6 +16,8 @@ import { AdManager } from '../src/ad/AdManager.js';
 import { StorageManager } from '../src/storage/StorageManager.js';
 import { ResourceLoop } from '../src/economy/ResourceLoop.js';
 import { OfflineIdle } from '../src/economy/OfflineIdle.js';
+import { SafeNumber } from '../src/security/SafeNumber.js';
+import { AntiCheat } from '../src/security/AntiCheat.js';
 
 console.log('====================================================');
 console.log('   家族修仙/官路 (Family Saga) 自动化回归测试启动   ');
@@ -200,6 +202,30 @@ assert.strictEqual(okUpAt, true, '点亮第一级商道聚鼎祖训应当成功'
 assert.strictEqual(at.getWealthMultiplier(), 0.12, '全境基础财富产出应当永久提高 +12%');
 console.log(`  ✔ 离线闭关挂机大礼 (+${offInfo.currencyAmount * 3}灵石) 与祖训基因洗练树 (+12%产出) 100% 校验成功！`);
 
+// === 测试8：反作弊与防篡改 (SafeNumber 内存防护 & HMAC 签名) ===
+console.log('\n[Test 8] 反作弊与防篡改 (SafeNumber 内存异或防护 & HMAC-SHA256 签名)');
+const safeMoney = new SafeNumber(5000);
+assert.strictEqual(safeMoney.get(), 5000, '正常读取 SafeNumber 应当准确无误');
+safeMoney.add(1200);
+assert.strictEqual(safeMoney.get(), 6200, '正常加法应当准确为 6200');
+
+// 模拟黑客用 GG 修改器直接篡改内存中的私有成员 _valEnc
+safeMoney._valEnc = 9999999 ^ safeMoney._mask; // 黑客绕过了哈希验证直接改数值
+const hackedVal = safeMoney.get();
+assert.strictEqual(hackedVal, 0, '非法篡改内存后，Hash 校验即刻捕获异常并拦截重置为 0！');
+console.log('  ✔ SafeNumber 内存异或混淆与盲改篡改拦截验证成功！');
+
+// 测试 HMAC-SHA256 存档防篡改
+const mockSave = { year: 15, generation: 3, spiritStones: 8888, saveTime: Date.now() };
+const signedSave = AntiCheat.signSavePacket(mockSave);
+assert.ok(signedSave._hmac, '存档包应当附带 HMAC-SHA256 完整性签名');
+assert.strictEqual(AntiCheat.verifySavePacket(signedSave), true, '合法签名存档应当通过校验');
+
+// 模拟黑客抓包或修改 JSON 存档中的灵石
+signedSave.spiritStones = 999999;
+assert.strictEqual(AntiCheat.verifySavePacket(signedSave), false, '非法篡改 JSON 存档数值后，HMAC-SHA256 校验必败！拦截读取！');
+console.log('  ✔ HMAC-SHA256 存档签名生成与篡改截杀验证成功！');
+
 console.log('\n====================================================');
-console.log('        🎉 所有 7 大综合集成回归测试 100% 通过！     ');
+console.log('        🎉 所有 8 大综合集成回归测试 100% 通过！     ');
 console.log('====================================================\n');

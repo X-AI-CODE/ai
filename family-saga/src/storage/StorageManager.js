@@ -4,26 +4,35 @@
  */
 
 import { Adapter } from '../core/Adapter.js';
+import { AntiCheat } from '../security/AntiCheat.js';
 
 export const SAVE_KEY = 'family_saga_save_v1';
 export const HALL_OF_FAME_KEY = 'family_saga_hall_of_fame';
 
 export class StorageManager {
-  // 保存游戏进度
+  // 保存游戏进度 (带 HMAC 安全签名)
   static saveGame(context) {
     if (!context) return false;
     const data = context.toJSON();
     data.saveTime = Date.now();
     data.version = '1.0.0';
-    Adapter.setStorage(SAVE_KEY, data);
+    const signedData = AntiCheat.signSavePacket(data);
+    Adapter.setStorage(SAVE_KEY, signedData || data);
     return true;
   }
 
-  // 读取现有存档
+  // 读取现有存档 (校验防篡改签名)
   static loadGame(context) {
     if (!context) return false;
     const data = Adapter.getStorage(SAVE_KEY, null);
     if (!data) return false;
+
+    // 校验签名完整性 (若玩家私自用编辑器修改了 localstorage 里 JSON 的灵石或银两，HMAC 即刻校验失效)
+    if (data._hmac && !AntiCheat.verifySavePacket(data)) {
+      Adapter.showToast('⚠️ 警告：检测到存档被修改或损坏，拒绝加载非法数值！');
+      return { success: false, corrupted: true };
+    }
+
     context.fromJSON(data);
     return { success: true, saveTime: data.saveTime || Date.now() };
   }

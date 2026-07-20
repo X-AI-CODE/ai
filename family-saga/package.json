@@ -1,0 +1,22 @@
+{
+  "name": "family-saga",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "家族修仙/官途 (Family Saga) — 单机微信小游戏",
+  "main": "game.js",
+  "scripts": {
+    "test": "node tests/run-tests.js"
+  },
+  "keywords": [
+    "wechat",
+    "minigame",
+    "xianxia",
+    "threejs",
+    "canvas"
+  ],
+  "author": "Arena Agent",
+  "license": "MIT",
+  "devDependencies": {
+    "three": "^0.185.1"
+  }
+}
